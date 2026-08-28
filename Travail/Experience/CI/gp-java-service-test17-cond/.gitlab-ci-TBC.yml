@@ -1,0 +1,75 @@
+default:
+  image: gitlab-registry.insee.fr/kubernetes/images/build/maven-jdk:21
+  tags:
+  - docker
+
+stages:
+- pre # GitLeaks
+- build # Maven
+- test # SAST, Dependancy Scanning et Container Scanning
+- quality # Maven (SonarQube)
+- security # Docker (Trivy)
+- package # Docker (Build)
+
+variables:
+  # Maven
+  MAVEN_OPTS: >-
+    -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dhttps.protocols=TLSv1.2
+  MAVEN_CLI_OPTS: >-
+    --batch-mode --errors --fail-at-end --show-version
+  # Docker
+  IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
+# Workflow
+workflow:
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event" # Déclenche la pipeline sur chaque de Merge Request
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Déclenche la pipeline sur la branche par défaut (main)
+
+# Components
+include:
+# GitLeaks
+- component: $CI_SERVER_FQDN/to-be-continuous/gitleaks/gitlab-ci-gitleaks@2.10.0
+  inputs:
+    args: "--no-banner"
+
+# Maven
+- component: $CI_SERVER_FQDN/to-be-continuous/maven/gitlab-ci-maven@5.4.0 # TO BE CONTINUOUS
+  inputs:
+    # Image de la version Java choisie dans le Golden Path
+    image: docker.io/library/maven:3.9.9-eclipse-temurin-21
+    project-dir: .
+    # mvn-custom-goals: clean verify # Nettoie le build précédent, compile, teste et vérifie le projet
+    sonar-quality-gate-enabled: true
+    # deploy-enabled: false
+
+    # Analyse statique
+- template: Security/SAST.gitlab-ci.yml
+
+# Détecte les CVE dans les dépendances du pom.xml
+- template: Security/Dependency-Scanning.gitlab-ci.yml
+
+# Scan de vulnérabilités de l'image
+- template: Security/Container-Scanning.gitlab-ci.yml
+
+# Docker
+- component: $CI_SERVER_FQDN/to-be-continuous/docker/gitlab-ci-docker@8.3.0 # TO BE CONTINUOUS
+  inputs:
+    build-tool: buildah
+    release-image: $IMAGE_NAME # Release ? Ou Snapshot ?
+    # Scan de vulnérabilités de l'image avec Trivy
+    healthcheck-disabled: false
+    trivy-image: gitlab.insee.fr/dsi/analyzer/composants/gitlab-ci-trivy-component/scan@2.0.0 # ??????????????????????
+    trivy-disabled: false
+
+# # JOBS CUSTOM
+
+# gitleaks:
+#   stage: pre
+#   image: zricethezav/gitleaks:v8.18.0
+#   script:
+#   - gitleaks detect --source . --verbose --redact
+#   allow_failure: false
+#   rules:
+#   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

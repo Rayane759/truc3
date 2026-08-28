@@ -1,0 +1,14 @@
+apiVersion: v2
+name: essai-chart-1 # Le nom de votre propre chart
+description: A Helm chart for Kubernetes
+
+type: application
+version: 0.1.0 # La version de votre chart
+appVersion: "0.1.0"
+
+dependencies:
+  - name: helm-example # à ne pas changer
+    repository: https://gitlab.insee.fr/api/v4/projects/10954/packages/helm/stable # à ne pas changer
+    version: 3.0.1 
+    # Prendre la dernière version disponible 
+    # (https://gitlab.insee.fr/kubernetes/charts/generique-insee/-/packages)

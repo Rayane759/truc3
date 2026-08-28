@@ -1,0 +1,24 @@
+output "app_name" {
+  description = "Nom de l'application déployée"
+  value       = var.app_name
+}
+
+output "environment" {
+  description = "Environnement"
+  value       = var.environment
+}
+
+{% if enableLoadBalancer %}
+output "load_balancer_endpoint" {
+  description = "Endpoint public du Load Balancer"
+  value       = local.lb_endpoint
+}
+{% endif %}
+
+{% if enableDatabase %}
+output "database_endpoint" {
+  description = "Endpoint de la base de données (non public)"
+  value       = local.db_endpoint
+  sensitive   = true
+}
+{% endif %}

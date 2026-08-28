@@ -1,0 +1,37 @@
+{% if enableDatabase %}
+resource "google_sql_database_instance" "app" {
+  name             = "${local.prefix}-db"
+  database_version = "{{ dbEngine | upper }}_{{ dbVersion }}"
+  region           = var.region
+  deletion_protection = var.environment == "pd"
+
+  settings {
+    tier = "db-f1-micro"
+
+    ip_configuration {
+      ipv4_enabled    = false
+      private_network = google_compute_network.main.id
+    }
+
+    backup_configuration {
+      enabled = var.environment == "pd"
+    }
+  }
+}
+
+resource "google_sql_database" "app" {
+  name     = replace(var.app_name, "-", "_")
+  instance = google_sql_database_instance.app.name
+}
+
+resource "google_sql_user" "app" {
+  name     = var.app_name
+  instance = google_sql_database_instance.app.name
+  password = random_password.db.result
+}
+
+resource "random_password" "db" {
+  length  = 24
+  special = false
+}
+{% endif %}

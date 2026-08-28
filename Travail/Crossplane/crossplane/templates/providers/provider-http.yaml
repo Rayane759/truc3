@@ -1,0 +1,41 @@
+# -----------------------------------------------------------------------------
+# Installation du provider provider-http
+# -----------------------------------------------------------------------------
+# provider-http permet de piloter n'importe quelle API REST comme des ressources
+# Crossplane. On l'utilise ici pour :
+#   - récupérer/rafraîchir le token OIDC Keycloak  (DisposableRequest, cf auth/)
+#   - gérer le cycle de vie des Applications SUGOI  (Request, cf raw/ et composition/)
+#
+# Pinne une version explicite (pas de :latest) pour la reproductibilité.
+# Vérifie la dernière release stable : https://github.com/crossplane-contrib/provider-http/releases
+# -----------------------------------------------------------------------------
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-http
+spec:
+  package: gitlab-registry.insee.fr/kubernetes/kubeqfapp/poc/crossplane/provider-http:v1.0.13
+  packagePullSecrets:
+    - name: registry-gitlab-insee-fr-pull-secret
+---
+# Optionnel : personnaliser le Deployment du controller (proxy sortant, ressources,
+# CA d'entreprise, etc.). À décommenter et référencer depuis le Provider ci-dessus
+# via spec.runtimeConfigRef si besoin (ex: proxy HTTPS_PROXY vers internet INSEE).
+#
+# apiVersion: pkg.crossplane.io/v1beta1
+# kind: DeploymentRuntimeConfig
+# metadata:
+#   name: provider-http-runtime
+# spec:
+#   deploymentTemplate:
+#     spec:
+#       selector: {}
+#       template:
+#         spec:
+#           containers:
+#             - name: package-runtime
+#               env:
+#                 - name: HTTPS_PROXY
+#                   value: "http://proxy.insee.fr:3128"
+#                 - name: NO_PROXY
+#                   value: ".svc,.cluster.local,10.0.0.0/8"

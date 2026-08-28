@@ -1,0 +1,95 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  ENTITY_NAMESPACE: "default"
+  ENTITY_KIND: "Component"
+  ENTITY_NAME: "documentation-platform-engineering"
+
+build-site:
+  stage: deploy
+  image: gitlab-registry.insee.fr/kubernetes/images/build/node-toolbox:24
+  # image: proxy-docker-io.insee.fr/spotify/techdocs:v1.2.8
+  tags:
+    - docker
+  variables:
+    TECHDOCS_S3_BUCKET_NAME: "projet-devexp-poc"
+    TECHDOCS_S3_ENDPOINT: "https://minio.dev.kube.insee.fr"
+    TECHDOCS_S3_ACCESS_KEY: "sa-projet-devexp-poc-rw"
+    TECHDOCS_S3_SECRET_KEY: "KevSdeIQb8Na4B5fTakM"
+    TECHDOCS_S3_REGION: "us-west-1"
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends python3 python3-venv python3-pip
+    - python3 -m venv venv
+    - export PATH=$PWD/venv/bin:$PATH
+    - pip config set global.index https://nexus.insee.fr/repository/pypi-proxy/pypi && pip config set global.index-url https://nexus.insee.fr/repository/pypi-proxy/simple && pip config set global.trusted-host nexus.insee.fr
+    - cd website/
+    - pip install -r requirements.txt
+    - npx npm install -g @techdocs/cli
+  script:
+    - npx @techdocs/cli generate -v --no-docker --output-dir ./site
+    - export AWS_ACCESS_KEY_ID=$TECHDOCS_S3_ACCESS_KEY
+    - export AWS_SECRET_ACCESS_KEY=$TECHDOCS_S3_SECRET_KEY
+    - export AWS_REGION=$TECHDOCS_S3_REGION
+    - npx @techdocs/cli publish --publisher-type awsS3 --awsS3ForcePathStyle --awsEndpoint $TECHDOCS_S3_ENDPOINT --storage-name $TECHDOCS_S3_BUCKET_NAME --entity $ENTITY_NAMESPACE/$ENTITY_KIND/$ENTITY_NAME
+
+generate presentation:
+  stage: build
+  image:
+    name: marpteam/marp-cli
+    entrypoint: [""]
+  script:
+    - mkdir -p build/$MD_DIR
+    - export MARP_USER="$(id -u):$(id -g)"
+    - cp -r $MD_DIR/assets/ build/$MD_DIR
+    - /home/marp/.cli/docker-entrypoint --allow-local-files -I $MD_DIR -o build/$MD_DIR
+    - /home/marp/.cli/docker-entrypoint --allow-local-files -I $MD_DIR --pdf -o build/$MD_DIR
+  artifacts:
+    paths:
+      - "build/$MD_DIR"
+  parallel:
+    matrix:
+      - MD_DIR: presentation/initiation
+      - MD_DIR: presentation/jeu-plateform-engineering
+      - MD_DIR: presentation/jeu-platform-engineering-extension
+      - MD_DIR: presentation/diagnostic
+      - MD_DIR: presentation/offre-et-organisation
+      - MD_DIR: presentation/poc/crossplane
+      - MD_DIR: presentation/roadmap
+
+pages:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  tags:
+    - docker
+  image: gitlab-registry.insee.fr/kubernetes/images/build/node-toolbox:24
+  variables:
+    GIT_DEPTH: 0
+    ENABLE_PDF_EXPORT: 1
+    GIT_PYTHON_REFRESH: quiet
+  before_script:
+    - cp -r build/presentation/initiation/ website/docs/autres/presentations/assets/initiation/
+    - cp -r build/presentation/jeu-plateform-engineering/ website/docs/autres/presentations/assets/jeu-plateform-engineering/
+    - cp -r build/presentation/jeu-platform-engineering-extension/ website/docs/autres/presentations/assets/jeu-platform-engineering-extension/
+    - cp -r build/presentation/diagnostic/ website/docs/autres/presentations/assets/diagnostic/
+    - cp -r build/presentation/offre-et-organisation/ website/docs/autres/presentations/assets/offre-et-organisation/
+    - cp -r build/presentation/poc/crossplane/ website/docs/autres/presentations/assets/crossplane/
+    - cp -r build/presentation/roadmap/ website/docs/autres/presentations/assets/roadmap/
+    - apt-get update && apt-get install -y --no-install-recommends python3 python3-venv python3-pip weasyprint
+    - python3 -m venv venv
+    - export PATH=$PWD/venv/bin:$PATH
+    - pip config set global.index https://nexus.insee.fr/repository/pypi-proxy/pypi && pip config set global.index-url https://nexus.insee.fr/repository/pypi-proxy/simple && pip config set global.trusted-host nexus.insee.fr
+    - cd website/
+  script:
+    - export PATH=$HOME/.local/bin:$PATH
+    - pip install -r requirements.txt
+    - mkdocs build --site-dir public
+    - cd .. && cp -r /builds/platform-engineering/documentation/website/public ./public
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 day
+  dependencies:
+    - generate presentation

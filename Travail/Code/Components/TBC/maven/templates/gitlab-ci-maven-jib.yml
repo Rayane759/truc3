@@ -1,0 +1,251 @@
+# =====================================================================================================================
+# === JIB template variant
+# =====================================================================================================================
+spec:
+  inputs:
+    jib-snapshot-image:
+      description: Maven Jib Snapshot image
+      default: $CI_REGISTRY_IMAGE/snapshot:$CI_COMMIT_REF_SLUG
+    jib-release-image:
+      description: Maven Jib Release image
+      default: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    skopeo-image:
+      description: The image used to publish images with Skopeo
+      default: quay.io/containers/skopeo:latest
+    jib-build-args:
+      description: '[Jib Maven Plugin arguments](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin#extended-usage)'
+      default: -Djib.to.image=$MAVEN_JIB_SNAPSHOT_IMAGE
+    jib-prod-publish-strategy:
+      description: Defines the publish to production strategy.
+      options:
+      - none
+      - manual
+      - auto
+      default: manual
+    jib-publish-args:
+      description: Additional [`skopeo copy` arguments](https://github.com/containers/skopeo/blob/master/docs/skopeo-copy.1.md#options)
+      default: ''
+    trivy-disabled:
+      description: Disable Maven Trivy
+      type: boolean
+      default: false
+    trivy-image:
+      description: The docker image used to scan images with Trivy
+      default: docker.io/aquasec/trivy:latest
+    trivy-args:
+      description: Additional [`trivy image` options](https://trivy.dev/docs/latest/references/configuration/cli/trivy_image/#options)
+      default: --ignore-unfixed --pkg-types os --disable-telemetry --skip-version-check
+    sbom-image:
+      default: docker.io/anchore/syft:debug
+    sbom-opts:
+      description: Options for syft used for SBOM analysis
+      default: --override-default-catalogers rpm-db-cataloger,alpm-db-cataloger,apk-db-cataloger,dpkg-db-cataloger,portage-cataloger,nix-store-cataloger,java
+---
+variables:
+  MAVEN_SBOM_IMAGE: $[[ inputs.sbom-image ]]
+  MAVEN_SBOM_OPTS: $[[ inputs.sbom-opts ]]
+  MAVEN_TRIVY_IMAGE: $[[ inputs.trivy-image ]]
+  MAVEN_TRIVY_DISABLED: $[[ inputs.trivy-disabled ]]
+  MAVEN_TRIVY_ARGS: $[[ inputs.trivy-args ]]
+  MAVEN_JIB_SNAPSHOT_IMAGE: $[[ inputs.jib-snapshot-image ]]
+  MAVEN_JIB_RELEASE_IMAGE: $[[ inputs.jib-release-image ]]
+  MAVEN_JIB_BUILD_ARGS: $[[ inputs.jib-build-args ]]
+  MAVEN_JIB_PROD_PUBLISH_STRATEGY: $[[ inputs.jib-prod-publish-strategy ]]
+  MAVEN_SKOPEO_IMAGE: $[[ inputs.skopeo-image ]]
+  MAVEN_JIB_PUBLISH_ARGS: $[[ inputs.jib-publish-args ]]
+
+.mvn-jib-scripts: &mvn-jib-scripts |
+  # BEGSCRIPT
+  set -eo pipefail
+  
+  function configure_registries_auth() {
+    maven_jib_snapshot_authn_token=$(echo -n "${MAVEN_JIB_REGISTRY_SNAPSHOT_USER:-${MAVEN_JIB_REGISTRY_USER:-$CI_REGISTRY_USER}}:${MAVEN_JIB_REGISTRY_SNAPSHOT_PASSWORD:-${MAVEN_JIB_REGISTRY_PASSWORD:-$CI_REGISTRY_PASSWORD}}" | base64 | tr -d '\n')
+    maven_jib_snapshot_registry_host=$(echo "$MAVEN_JIB_SNAPSHOT_IMAGE" | cut -d/ -f1)
+
+    maven_jib_release_authn_token=$(echo -n "${MAVEN_JIB_REGISTRY_RELEASE_USER:-${MAVEN_JIB_REGISTRY_USER:-$CI_REGISTRY_USER}}:${MAVEN_JIB_REGISTRY_RELEASE_PASSWORD:-${MAVEN_JIB_REGISTRY_PASSWORD:-$CI_REGISTRY_PASSWORD}}" | base64 | tr -d '\n')
+    maven_jib_release_registry_host=$(echo "$MAVEN_JIB_RELEASE_IMAGE" | cut -d/ -f1)
+
+    maven_jib_snapshot_config_json=$(echo -n "{\"auths\":{\"$maven_jib_snapshot_registry_host\":{\"auth\":\"$maven_jib_snapshot_authn_token\"},\"HttpHeaders\":{\"User-Agent\":\"$USER_AGENT\"}}}")
+    maven_jib_release_config_json=$(echo -n "{\"auths\":{\"$maven_jib_release_registry_host\":{\"auth\":\"$maven_jib_release_authn_token\"},\"HttpHeaders\":{\"User-Agent\":\"$USER_AGENT\"}}}")
+
+    BUILDTOOL_HOME=${BUILDTOOL_HOME:-$HOME}
+    # Create Docker auth config (supported by Jib)
+    mkdir -p "$BUILDTOOL_HOME/.docker"
+    echo "${maven_jib_snapshot_config_json}" > $BUILDTOOL_HOME/.docker/config.json
+    echo "${maven_jib_release_config_json}" > $BUILDTOOL_HOME/.docker/release-config.json
+    
+    log_info "Registry authentication configured for \\e[33;1m${maven_jib_snapshot_registry_host}\\e[0m"
+  }
+
+  function create_dotenv_file() {
+    jib_digest=$1
+    jib_image=${2:-$MAVEN_JIB_SNAPSHOT_IMAGE}
+
+    jib_repository=${jib_image%:*}
+    jib_tag=${jib_image##*:}
+    {
+      echo "jib_image=$jib_image"
+      echo "jib_image_digest=$jib_repository@$jib_digest"
+      echo "jib_repository=$jib_repository"
+      echo "jib_tag=$jib_tag"
+      echo "jib_digest=$jib_digest"
+    } > jib.env
+    chmod 644 jib.env
+  }
+  
+  configure_registries_auth
+
+  # ENDSCRIPT
+  
+mvn-build:
+  extends: .mvn-base
+  script:
+    # initialize Docker auth config
+    - !reference [.mvn-jib-scripts]
+    # build and push snapshot container
+    - >- 
+      mvn ${TRACE+-X} $MAVEN_CLI_OPTS $mvn_settings_opt $java_proxy_args verify 
+      com.google.cloud.tools:jib-maven-plugin:build 
+      $MAVEN_JIB_BUILD_ARGS
+    - output_coverage
+    - create_dotenv_file "$(cat target/jib-image.digest | cut -f2 -d':' )"
+  artifacts:
+    reports:
+      dotenv:
+        - jib.env
+
+mvn-sbom:
+  extends: .mvn-base
+  stage: package-test
+  image:
+    name: $MAVEN_SBOM_IMAGE
+    entrypoint: [""]
+  # force no dependency
+  dependencies: []
+  script:
+    # initialize Docker auth config
+    - !reference [.mvn-jib-scripts]
+    - mkdir -p -m 777 reports
+    - /syft scan $MAVEN_JIB_SNAPSHOT_IMAGE $MAVEN_SBOM_OPTS -o cyclonedx-json=reports/mvn-sbom-${jib_digest}.cyclonedx.json
+    - chmod a+r reports/mvn-sbom-${jib_digest}.cyclonedx.json
+  artifacts:
+    name: "SBOM for container from $CI_PROJECT_NAME on $CI_COMMIT_REF_SLUG"
+    expire_in: 1 week
+    when: always
+    paths:
+      - "reports/mvn-sbom-*.cyclonedx.json"
+    reports:
+      cyclonedx: 
+        - "reports/mvn-sbom-*.cyclonedx.json"
+
+mvn-trivy:
+  extends: .mvn-base
+  stage: package-test
+  image:
+    name: $MAVEN_TRIVY_IMAGE
+    entrypoint: [""]
+  dependencies: []
+  variables:
+    TRIVY_CACHE_DIR: ".trivycache/"
+  script: |
+    # cache cleanup is needed when scanning images with the same tags, it does not remove the database
+    trivy clean --scan-cache || trivy image --clear-cache
+    export TRIVY_USERNAME=${MAVEN_JIB_REGISTRY_SNAPSHOT_USER:-${MAVEN_JIB_REGISTRY_USER:-$CI_REGISTRY_USER}}
+    export TRIVY_PASSWORD=${MAVEN_JIB_REGISTRY_SNAPSHOT_PASSWORD:-${MAVEN_JIB_REGISTRY_PASSWORD:-$CI_REGISTRY_PASSWORD}}
+    export basename=$(echo "${MAVEN_JIB_SNAPSHOT_IMAGE}" | sed 's|[/:]|_|g')
+    mkdir -p ./reports
+    if [[ -z "$TRIVY_SERVER" ]]; then
+      log_warn "\\e[93mYou are using Trivy in standalone mode. To get faster scans, consider setting the TRIVY_SERVER variable to the address of a Trivy server. More info here: https://trivy.dev/docs/latest/references/modes/client-server/\\e[0m"
+    fi
+    # Generate the native JSON report that can later be converted to other formats
+    trivy image --no-progress ${MAVEN_TRIVY_ARGS} --exit-code 1 --format json --output reports/jib-trivy-${basename}.native.json $MAVEN_JIB_SNAPSHOT_IMAGE || exit_code=$?
+
+    # Generate a report in the GitLab format
+    trivy convert --format template --template "@/contrib/gitlab.tpl" --output reports/jib-trivy-${basename}.gitlab.json reports/jib-trivy-${basename}.native.json
+    # Generate a report in the Code Quality format
+    trivy convert --format template --template "@/contrib/gitlab-codequality.tpl" --output reports/jib-trivy-${basename}.gitlab-codequality.json reports/jib-trivy-${basename}.native.json
+
+    # console output
+    trivy convert --format table reports/jib-trivy-${basename}.native.json
+
+    exit $exit_code
+  artifacts:
+    name: "$CI_JOB_NAME artifacts from $CI_PROJECT_NAME on $CI_COMMIT_REF_SLUG"
+    expire_in: 1 day
+    when: always
+    paths:
+    - "reports/jib-trivy-*"
+    reports:
+      container_scanning: "reports/jib-trivy-*.gitlab.json"
+      codequality: "reports/jib-trivy-*.gitlab-codequality.json"
+  cache:
+    - key: "$CI_COMMIT_REF_SLUG-trivy"
+      paths:
+        - .trivycache/
+  rules:
+    - if: '$MAVEN_TRIVY_DISABLED == "true"'
+      when: never
+    - !reference [.test-policy, rules]
+            
+mvn-deploy-release:
+  extends: .mvn-base
+  image:
+    name: "$MAVEN_SKOPEO_IMAGE"
+    entrypoint: [""]
+  stage: publish
+  variables:
+    GIT_STRATEGY: none
+  script:
+    # initialize Docker auth config
+    - !reference [.mvn-jib-scripts]
+    - |
+      if [[ "${SEMREL_INFO_ON}" && "${MVN_SEMREL_RELEASE_DISABLED}" != "true" ]]
+      then
+        if [[ -z "${SEMREL_INFO_NEXT_VERSION}" ]]
+        then
+          log_warn "[semantic-release] no new version to release: skip"
+          exit 0
+        else
+          MAVEN_JIB_RELEASE_IMAGE="${MAVEN_JIB_RELEASE_IMAGE%:*}:$SEMREL_INFO_NEXT_VERSION"
+          log_info "[semantic-release] new Image tag is set: $MAVEN_JIB_RELEASE_IMAGE"
+        fi
+      fi
+
+      if [[ "$MAVEN_JIB_SNAPSHOT_IMAGE" == "$MAVEN_JIB_RELEASE_IMAGE" ]]
+      then
+        log_warn "\\e[93mYou should consider distinguishing snapshot and release images as they do not differ. Skipping publish phase as image has already been created by previous job.\\e[0m"
+        exit 0
+      fi
+      BUILDTOOL_HOME=${BUILDTOOL_HOME:-$HOME}
+      skopeo copy --src-authfile $BUILDTOOL_HOME/.docker/config.json --dest-authfile $BUILDTOOL_HOME/.docker/release-config.json ${MAVEN_JIB_PUBLISH_ARGS} docker://$MAVEN_JIB_SNAPSHOT_IMAGE docker://$MAVEN_JIB_RELEASE_IMAGE
+      log_info "Well done, your image is published and can be downloaded by doing: docker pull $MAVEN_JIB_RELEASE_IMAGE"
+    - jib_digest=$(skopeo inspect --authfile $BUILDTOOL_HOME/.docker/release-config.json --format='{{ .Digest }}' "docker://$MAVEN_JIB_RELEASE_IMAGE")
+    - create_dotenv_file "$jib_digest" "$MAVEN_JIB_RELEASE_IMAGE"
+  artifacts:
+    reports:
+      dotenv:
+        - jib.env
+  rules:
+    # exclude if $MAVEN_DEPLOY_ENABLED not set
+    - if: '$MAVEN_DEPLOY_ENABLED != "true"'
+      when: never
+    # on tag: if semrel info not enabled or semrel integration disabled
+    - if: '$CI_COMMIT_TAG'
+    # exclude non-production branches
+    - if: '$CI_COMMIT_REF_NAME !~ $PROD_REF'
+      when: never
+    # exclude if snapshot is same as release image and semrel info not enabled or semrel integration disabled
+    - if: '$MAVEN_JIB_SNAPSHOT_IMAGE == $MAVEN_JIB_RELEASE_IMAGE && ($SEMREL_INFO_ON == null || $SEMREL_INFO_ON == "" || $MVN_SEMREL_RELEASE_DISABLED == "true")'
+      when: never
+    - if: '$MAVEN_JIB_PROD_PUBLISH_STRATEGY == "manual"'
+      when: manual
+    - if: '$MAVEN_JIB_PROD_PUBLISH_STRATEGY == "auto"'
+
+# =====================================================================================================================
+# === Disable Maven template jobs not required for Docker Jib pipeline
+# =====================================================================================================================
+
+# mvn-build supersedes - deploys a snapshot container to the registry
+mvn-deploy-snapshot:
+  rules:
+    - when: never

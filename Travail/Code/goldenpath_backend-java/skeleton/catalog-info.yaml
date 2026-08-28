@@ -1,0 +1,23 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.artifactId }}
+  title: ${{ values.name }}
+  description: ${{ values.description }}
+  annotations:
+    gitlab.com/project-slug: ${{ values.repoUrl }}
+    gitlab.com/ci-pipeline: ${{ values.repoUrl }}/-/pipelines
+    backstage.io/techdocs-ref: dir:.
+  tags:
+  - java
+  - spring-boot ${{ "- security" if values.hasSecurity }} ${{ "- observability" if values.hasObservability }} ${{ "- vault" if values.hasVault }}
+
+spec:
+  type: service
+  owner: ${{ values.team }}
+  lifecycle: experimental
+
+  dependsOn: ${{ "- resource:default/vault" if values.hasVault }} ${{ "- resource:default/postgres" if values.hasDatabase }}
+
+  profile:
+    displayName: ${{ values.name }}

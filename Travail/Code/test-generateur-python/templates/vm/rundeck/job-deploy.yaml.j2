@@ -1,0 +1,60 @@
+- defaultTab: nodes
+  description: |
+    Déploie une version de {{ appName }} via Ansible.
+    Télécharge l'artefact depuis Nexus ({{ nexusUrl }})
+    et redémarre le service sur la VM cible.
+  executionEnabled: true
+  group: "{{ teamName }}/{{ appName }}"
+  id: deploy-{{ appName }}-{{ environnement }}
+  loglevel: INFO
+  name: "Deploy {{ appName }} ({{ environnement }})"
+  nodeFilterEditable: false
+
+  options:
+    - name: artifact_version
+      label: "Version à déployer"
+      description: "Tag de l'artefact dans Nexus (ex: 1.2.3)"
+      required: true
+      regex: '^[0-9]+\.[0-9]+\.[0-9]+$'
+
+    - name: dry_run
+      label: "Simulation (dry-run)"
+      description: "Si activé, affiche les changements sans les appliquer"
+      required: false
+      values:
+        - "true"
+        - "false"
+      value: "false"
+
+  sequence:
+    keepgoing: false
+    strategy: node-first
+    commands:
+
+      - description: "Vérifier la disponibilité de l'artefact dans Nexus"
+        exec: >
+          curl -sf --head
+          "{{ nexusUrl }}/repository/{{ nexusRepository }}/{{ appName }}/${RD_OPTION_ARTIFACT_VERSION}/{{ appName }}-${RD_OPTION_ARTIFACT_VERSION}.{{ artifactFormat }}"
+          -o /dev/null
+
+      - description: "Lancer le playbook Ansible"
+        exec: >
+          ansible-playbook
+          -i ansible/inventory.ini
+          ansible/playbook.yml
+          -e "artifact_version=${RD_OPTION_ARTIFACT_VERSION}"
+          {% raw %}$( [ "${RD_OPTION_DRY_RUN}" = "true" ] && echo "--check" ){% endraw %}
+
+      - description: "Vérifier la santé de l'application"
+        exec: >
+          curl -sf "http://{{ '${VM_IP}' }}:{{ appPort }}/actuator/health" | grep -q '"status":"UP"'
+
+  notification:
+    onfailure:
+      email:
+        recipients: "{{ teamName }}@example.fr"
+        subject: "[ÉCHEC] Déploiement {{ appName }} {{ environnement }} — ${RD_OPTION_ARTIFACT_VERSION}"
+    onsuccess:
+      email:
+        recipients: "{{ teamName }}@example.fr"
+        subject: "[OK] Déploiement {{ appName }} {{ environnement }} — ${RD_OPTION_ARTIFACT_VERSION}"

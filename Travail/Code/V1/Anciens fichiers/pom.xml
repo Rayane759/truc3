@@ -1,0 +1,153 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.example</groupId>
+	<artifactId>${{ values.name }}</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>${{ values.springBootVersion }}</version>
+	</parent>
+
+	<groupId>${{ values.groupId }}</groupId>
+	<artifactId>${{ values.artifactId }}</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>${{ values.name }}</name>
+	<description>${{ values.description }}</description>
+
+	<properties>
+		<java.version>${{ values.javaVersion }}</java.version>
+		<springdoc.version>2.5.0</springdoc.version>
+		<!-- - A voir si on garde quand on ajoutera le conditionnel
+		{%- if values.hasSecurity %}
+		<spring-security.version>6.3.0</spring-security.version>/>
+		{%- endif %}
+		{%- if values.hasVault %}
+		<spring-cloud.version>2023.0.2</spring-cloud.version>
+		{%- endif %}
+		<!- -->
+	</properties>
+
+	<dependencies>
+
+		<dependency> <!-- Vient de "api-spring-boot" -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- ================= Swagger ================= -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc.version}</version>
+		</dependency>
+
+		<dependency> <!-- Vient de "api-spring-boot" -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency> <!-- Vient de "api-spring-boot" -->
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- - A voir si on garde quand on ajoutera le conditionnel
+		{%- if values.hasSecurity %}
+		<!- -->
+		<!-- ================= Security ================= -->
+		<!-- - A voir si on garde quand on ajoutera le conditionnel
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+		{%- endif %}
+		<!- -->
+
+		<!-- - A voir si on garde quand on ajoutera le conditionnel
+		{%- if values.hasObservability %}
+		<!- -->
+		<!-- ================= Observability ================= -->
+		<!-- - A voir si on garde quand on ajoutera le conditionnel
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-otel</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>7.4</version>
+		</dependency>
+		{%- endif %}
+		<!- -->
+
+		<!-- - A voir si on garde quand on ajoutera le conditionnel
+		{%- if values.hasVault %}
+		<!- -->
+		<!-- ================= Vault ================= -->
+		<!-- - A voir si on garde quand on ajoutera le conditionnel
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-vault-config</artifactId>
+		</dependency>
+		{%- endif %}
+		<!- -->
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
+
+		<!-- ================= Test ================= -->
+		<dependency> <!-- Vient de "api-spring-boot" -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- - A voir si on garde quand on ajoutera le conditionnel
+		{%- if values.hasSecurity %}
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		{%- endif %}
+		<!- -->
+
+	</dependencies>
+
+	<build> <!-- Vient de "api-spring-boot" -->
+		<finalName>ROOT</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

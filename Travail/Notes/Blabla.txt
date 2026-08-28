@@ -1,0 +1,59 @@
+Phase 1 — Socle de démarrage
+	pom.xml
+	Maven Wrapper
+	README.md
+	application.properties
+	structure Java de base
+	squelette de tests
+
+
+Phase 2 — Intégration et standardisation
+	Dockerfile
+	catalog-info.yaml
+	.gitignore enrichi
+	application-local.properties ou équivalent
+	.env.example
+
+
+Phase 3 — Industrialisation
+	.gitlab-ci.yml
+	observabilité
+	sécurité
+	Vault
+	healthchecks avancés
+	déploiement Kubernetes plus complet
+	
+	
+	
+	
+	
+Commits, Pull requests ... Il faut normaliser
+
+
+On fait plus du React-ts maintenant
+Et aussi, on fait du pnpm (il faut installer NodeJS sur Si@moi), et après ça marche
+
+On a push le truc en React dans le Gitlab, donc ça passe
+
+
+On fait plutôt du CI-Component que du CI "simple"
+On a pris dans Kubernetes/Images/run/elastic-agent/Repository
+
+Dans le "component", le dépot désigne le dépôt GitOps
+Le chemin du fichier c'est dans "file to change"
+
+
+
+
+
+Quarkus : Concurrent de SpringBoot ??????
+
+Properties.json ??? (VS Properties.env)
+
+Nginx "hardened" (contre StaticWebServer ???)
+
+
+
+
+platform-engineering/poc/generated
+Repository : nom du dépot GitLab

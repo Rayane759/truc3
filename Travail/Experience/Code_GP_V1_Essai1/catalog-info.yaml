@@ -1,0 +1,102 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: golden-path-service
+  title: Golden Path Service
+  description: Create a fully configured service (GitOps ready)
+
+spec:
+  owner: team-platform
+  type: service
+
+  parameters:
+    - title: Project configuration
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          title: Service name
+
+        hasBackend:
+          type: boolean
+          title: Backend Java
+          default: true
+
+        hasFrontend:
+          type: boolean
+          title: Frontend React
+          default: false
+
+        hasDatabase:
+          type: boolean
+          title: Postgres
+          default: false
+
+    - title: Repository
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - gitlab.insee.fr
+
+  steps:
+
+    # -------------------------
+    # 1. Generate project
+    # -------------------------
+    - id: fetch
+      name: Generate project
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          hasBackend: ${{ parameters.hasBackend }}
+          hasFrontend: ${{ parameters.hasFrontend }}
+
+    # -------------------------
+    # 2. Create GitLab repo
+    # -------------------------
+    - id: publish
+      name: Create repository
+      action: publish:gitlab
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+
+    # -------------------------
+    # 3. GitOps (MR infra)
+    # -------------------------
+    - id: create-mr
+      name: Create GitOps Merge Request
+      action: gitlab:mergeRequest:create
+      input:
+        repoUrl: gitlab.insee.fr?owner=platform&repo=infra
+        title: "feat: onboard ${{ parameters.name }}"
+        description: "Add Helm chart for ${{ parameters.name }}"
+        branchName: feat/onboard-${{ parameters.name }}
+        targetBranchName: main
+        sourcePath: ./helm
+        targetPath: services/${{ parameters.name }}
+
+    # -------------------------
+    # 4. Register in Backstage
+    # -------------------------
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        entityRef: ${{ steps.register.output.entityRef }}

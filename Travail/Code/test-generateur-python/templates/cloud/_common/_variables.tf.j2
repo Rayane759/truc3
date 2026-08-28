@@ -1,0 +1,49 @@
+variable "app_name" {
+  description = "Nom de l'application"
+  type        = string
+  default     = "{{ appName }}"
+}
+
+variable "team_name" {
+  description = "Équipe responsable"
+  type        = string
+  default     = "{{ teamName }}"
+}
+
+variable "environment" {
+  description = "Environnement cible"
+  type        = string
+  default     = "{{ environnement }}"
+}
+
+variable "region" {
+  description = "Région cloud cible"
+  type        = string
+  default     = "{{ cloudRegion }}"
+}
+
+variable "instance_type" {
+  description = "Type d'instance"
+  type        = string
+  default     = "{{ instanceType }}"
+}
+
+variable "app_port" {
+  description = "Port applicatif exposé"
+  type        = number
+  default     = {{ appPort }}
+}
+
+{% if enableDatabase %}
+variable "db_engine" {
+  description = "Moteur de base de données"
+  type        = string
+  default     = "{{ dbEngine }}"
+}
+
+variable "db_version" {
+  description = "Version du moteur de base de données"
+  type        = string
+  default     = "{{ dbVersion }}"
+}
+{% endif %}

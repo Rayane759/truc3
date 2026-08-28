@@ -1,0 +1,31 @@
+Je veux faire une appli :
+
+	Configurer son poste
+Se connecter
+...
+
+	Créer un projet
+Architecture de fichiers et tout
+Configurer Maven (notamment en Java du coup)
+Installer certificats pour le JDK (?????)
+Configurer le proxy (???)
+
+	Coder
+Créer le code applicatif
+
+	Tester
+Écrire les tests
+(Pipeline CI)
+
+	Créer environnement
+De dev ou de pré-prod (tests plus poussés)
+
+	Observabilité
+Mettre en place des métriques / du monitoring / ...
+
+	Déployer
+Exposer l'application
+Environnement de prod
+(Pipeline CD)
+
+	Mettre à jour l'appli

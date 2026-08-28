@@ -1,0 +1,346 @@
+{
+  "name": "Maven",
+  "description": "Build, test and analyse your [Maven](https://maven.apache.org/)-based projects",
+  "template_path": "templates/gitlab-ci-maven.yml",
+  "kind": "build",
+  "prefix": "maven",
+  "job_prefix": "mvn",
+  "is_component": true,
+  "variables": [
+    {
+      "name": "MAVEN_IMAGE",
+      "description": "The Docker image used to run Maven - **set the version required by your project**",
+      "default": "docker.io/library/maven:latest"
+    },
+    {
+      "name": "MAVEN_PROJECT_DIR",
+      "description": "Maven project root directory",
+      "default": ".",
+      "advanced": true
+    },
+    {
+      "name": "MAVEN_CFG_DIR",
+      "description": "The Maven configuration directory",
+      "default": ".m2",
+      "advanced": true
+    },
+    {
+      "name": "MAVEN_SETTINGS_FILE",
+      "description": "The Maven `settings.xml` file path",
+      "default": "$MAVEN_CFG_DIR/settings.xml",
+      "advanced": true
+    },
+    {
+      "name": "MAVEN_OPTS",
+      "description": "[Global Maven options](http://maven.apache.org/configure.html#maven_opts-environment-variable)",
+      "default": "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=${MAVEN_CFG_DIR}/repository -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true",
+      "advanced": true
+    },
+    {
+      "name": "MAVEN_CLI_OPTS",
+      "description": "Additional [Maven options](https://maven.apache.org/ref/3-LATEST/maven-embedder/cli.html) used on the command line",
+      "default": "--no-transfer-progress --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true",
+      "advanced": true
+    },
+    {
+      "name": "MAVEN_BUILD_ARGS",
+      "description": "Maven arguments for the build & test job",
+      "default": "org.jacoco:jacoco-maven-plugin:prepare-agent verify org.jacoco:jacoco-maven-plugin:report",
+      "advanced": true
+    }
+  ],
+  "features": [
+    {
+      "id": "sonar",
+      "name": "SONAR",
+      "description": "Code quality and security analysis with [SONARQube](https://www.sonarqube.org/)",
+      "variables": [
+        {
+          "name": "SONAR_HOST_URL",
+          "type": "url",
+          "description": "SonarQube server url",
+          "mandatory": true
+        },
+        {
+          "name": "SONAR_TOKEN",
+          "description": "SonarQube authentication token (see https://docs.sonarsource.com/sonarqube-server/user-guide/managing-tokens/) - depends on your authentication method",
+          "secret": true
+        },
+        {
+          "name": "SONAR_LOGIN",
+          "description": "SonarQube login (depends on your authentication method)",
+          "secret": true
+        },
+        {
+          "name": "SONAR_PASSWORD",
+          "description": "SonarQube password (depends on your authentication method)",
+          "secret": true
+        },
+        {
+          "name": "SONAR_BASE_ARGS",
+          "description": "SonarQube [analysis arguments](https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/analysis-parameters/)",
+          "default": "org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.links.homepage=${CI_PROJECT_URL} -Dsonar.links.ci=${CI_PROJECT_URL}/-/pipelines -Dsonar.links.issue=${CI_PROJECT_URL}/-/issues",
+          "advanced": true
+        },
+        {
+          "name": "SONAR_QUALITY_GATE_ENABLED",
+          "description": "Enables SonarQube [Quality Gate](https://docs.sonarsource.com/sonarqube-server/quality-standards-administration/managing-quality-gates/introduction/) verification.\n\n_Uses `sonar.qualitygate.wait` parameter ([see doc](https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/ci-integration/overview/#quality-gate-fails))._",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "dependency-check",
+      "name": "Dependency-Check",
+      "description": "[Dependency-Check](https://jeremylong.github.io/DependencyCheck/dependency-check-maven/configuration.html) analysis",
+      "disable_with": "MAVEN_DEPENDENCY_CHECK_DISABLED",
+      "variables": [
+        {
+          "name": "MAVEN_DEPENDENCY_CHECK_ARGS",
+          "description": "Maven arguments for Dependency Check job",
+          "default": "org.owasp:dependency-check-maven:aggregate -DretireJsAnalyzerEnabled=false -DassemblyAnalyzerEnabled=false -Dformats=HTML,JSON,XML",
+          "advanced": true
+        }
+      ]
+    },
+    {
+      "id": "forbid-snapshot-dependencies",
+      "name": "Snapshot dependencies verification",
+      "description": "This job verifies your project has no _snapshot_ dependencies. Failure is allowed in feature branches.",
+      "disable_with": "MVN_FORBID_SNAPSHOT_DEPENDENCIES_DISABLED"
+    },
+    {
+      "id": "sbom",
+      "name": "Software Bill of Materials",
+      "description": "This job generates a file listing all dependencies using [cyclonedx-maven-plugin](https://github.com/CycloneDX/cyclonedx-maven-plugin)",
+      "disable_with": "MAVEN_SBOM_DISABLED",
+      "variables": [
+        {
+          "name": "TBC_SBOM_MODE",
+          "type": "enum",
+          "values": ["onrelease", "always"],
+          "description": "Controls when SBOM reports are generated (`onrelease`: only on `$INTEG_REF`, `$PROD_REF` and `$RELEASE_REF` pipelines; `always`: any pipeline)",
+          "advanced": true,
+          "default": "onrelease"
+        },
+        {
+          "name": "MAVEN_SBOM_GEN_ARGS",
+          "description": "Maven command used for SBOM analysis",
+          "default": "org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom",
+          "advanced": true
+        }
+      ]
+    },
+    {
+      "id": "publish",
+      "name": "Publish",
+      "description": "Publish [Snapshot](https://maven.apache.org/plugins/maven-deploy-plugin/) & [Releases](http://maven.apache.org/maven-release/maven-release-plugin) to a Maven-compliant repository",
+      "enable_with": "MAVEN_DEPLOY_ENABLED",
+      "variables": [
+        {
+          "name": "MAVEN_DEPLOY_ARGS",
+          "description": "Maven arguments for the deploy job",
+          "default": "deploy -Dmaven.test.skip=true",
+          "advanced": true
+        },
+        {
+          "name": "MAVEN_DEPLOY_FROM_UNPROTECTED_DISABLED",
+          "description": "Set to limit snapshot publication to protected branches",
+          "type": "boolean",
+          "advanced": true
+        },
+        {
+          "name": "MAVEN_DEPLOY_SNAPSHOT_WITH_SLUG_ENABLED",
+          "description": "Enable to inject the Git branch slug in SNAPSHOT versions",
+          "type": "boolean",
+          "advanced": true
+        },
+        {
+          "name": "MAVEN_RELEASE_ARGS",
+          "description": "Maven arguments for the release job",
+          "default": "release:prepare -DtagNameFormat=@{project.version} -Darguments=-Dmaven.test.skip=true",
+          "advanced": true
+        },
+        {
+          "name": "MAVEN_RELEASE_VERSION",
+          "description": "Explicit version to use when triggering a release\n\n_Otherwise uses the current snapshot version from `pom.xml`)_",
+          "advanced": true
+        },
+        {
+          "name": "MAVEN_RELEASE_SCM_COMMENT_PREFIX",
+          "description": "Maven release plugin [scmCommentPrefix](https://maven.apache.org/maven-release/maven-release-plugin/prepare-mojo.html#scmCommentPrefix) parameter",
+          "default": "chore(maven-release): ",
+          "advanced": true
+        },
+        {
+          "name": "MAVEN_RELEASE_SCM_RELEASE_COMMENT",
+          "description": "Maven release plugin [scmReleaseCommitComment](https://maven.apache.org/maven-release/maven-release-plugin/prepare-mojo.html#scmReleaseCommitComment) parameter\n\n(since Maven `3.0.0-M1`)",
+          "advanced": true
+        },
+        {
+          "name": "MAVEN_RELEASE_SCM_DEV_COMMENT",
+          "description": "Maven release plugin [scmDevelopmentCommitComment](https://maven.apache.org/maven-release/maven-release-plugin/prepare-mojo.html#scmDevelopmentCommitComment) parameter\n\n(since Maven `3.0.0-M1`)",
+          "advanced": true
+        },
+        {
+          "name": "MVN_SEMREL_RELEASE_DISABLED",
+          "description": "Disable semantic-release integration",
+          "advanced": true
+        },
+        {
+          "name": "GIT_USERNAME",
+          "description": "Git username (if you wish to release using Git credentials)",
+          "secret": true
+        },
+        {
+          "name": "GIT_PASSWORD",
+          "description": "Git password (if you wish to release using Git credentials)",
+          "secret": true
+        },
+        {
+          "name": "GIT_PRIVATE_KEY",
+          "description": "Git private SSH key (if you wish to release using SSH key or GitLab Deploy Key)",
+          "secret": true
+        },
+        {
+          "name": "GIT_SIGNING_KEY_GPG",
+          "description": "Git GPG signing key to use for commit signing (global TBC variable)",
+          "advanced": true,
+          "secret": true
+        },
+        {
+          "name": "GIT_SIGNING_KEY_SSH",
+          "description": "Git SSH signing key to use for commit signing (global TBC variable)",
+          "advanced": true,
+          "secret": true
+        },
+        {
+          "name": "MAVEN_REPOSITORY_USERNAME",
+          "description": "Maven repository username (inject in your settings.xml as ${env.MAVEN_REPOSITORY_USERNAME})",
+          "secret": true
+        },
+        {
+          "name": "MAVEN_REPOSITORY_PASSWORD",
+          "description": "Maven repository password (inject in your settings.xml as ${env.MAVEN_REPOSITORY_PASSWORD})",
+          "secret": true
+        }
+      ]
+    }
+  ],
+  "variants": [
+    {
+      "id": "jib",
+      "name": "Jib",
+      "description": "Build Docker and OCI images for your Java applications with [Jib](https://github.com/GoogleContainerTools/jib)",
+      "template_path": "templates/gitlab-ci-maven-jib.yml",
+      "features": [
+        {
+          "id": "mvn-trivy",
+          "name": "Maven Trivy",
+          "description": "[Trivy](https://trivy.dev) vulnerability analysis",
+          "disable_with": "MAVEN_TRIVY_DISABLED",
+          "variables": [
+            {
+              "name": "MAVEN_TRIVY_IMAGE",
+              "description": "The docker image used to scan images with Trivy",
+              "default": "docker.io/aquasec/trivy:latest",
+              "advanced": true
+            },
+            {
+              "name": "MAVEN_TRIVY_ARGS",
+              "description": "Additional [`trivy image` options](https://trivy.dev/docs/latest/references/configuration/cli/trivy_image/#options)",
+              "default": "--ignore-unfixed --pkg-types os --disable-telemetry --skip-version-check",
+              "advanced": true
+            }
+          ]
+        },
+        {
+          "id": "mvn-sbom",
+          "name": "Maven Software Bill of Materials",
+          "description": "This job generates a file listing all dependencies using [syft](https://github.com/anchore/syft)",
+          "disable_with": "MAVEN_SBOM_DISABLED",
+          "variables": [
+            {
+              "name": "MAVEN_SBOM_IMAGE",
+              "default": "docker.io/anchore/syft:debug",
+              "advanced": true
+            },
+            {
+              "name": "MAVEN_SBOM_OPTS",
+              "description": "Options for syft used for SBOM analysis",
+              "default": "--override-default-catalogers rpm-db-cataloger,alpm-db-cataloger,apk-db-cataloger,dpkg-db-cataloger,portage-cataloger,nix-store-cataloger,java",
+              "advanced": true
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "name": "MAVEN_JIB_SNAPSHOT_IMAGE",
+          "description": "Maven Jib Snapshot image",
+          "default": "$CI_REGISTRY_IMAGE/snapshot:$CI_COMMIT_REF_SLUG"
+        },
+        {
+          "name": "MAVEN_JIB_RELEASE_IMAGE",
+          "description": "Maven Jib Release image",
+          "default": "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
+        },
+        {
+          "name": "MAVEN_SKOPEO_IMAGE",
+          "description": "The image used to publish images with Skopeo",
+          "default": "quay.io/containers/skopeo:latest",
+          "advanced": true
+        },
+        {
+          "name": "MAVEN_JIB_BUILD_ARGS",
+          "description": "[Jib Maven Plugin arguments](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin#extended-usage)",
+          "default": "-Djib.to.image=$MAVEN_JIB_SNAPSHOT_IMAGE"
+        },
+        {
+          "name": "MAVEN_JIB_PROD_PUBLISH_STRATEGY",
+          "description": "Defines the publish to production strategy.",
+          "type": "enum",
+          "values": ["none", "manual", "auto"],
+          "default": "manual"
+        },
+        {
+          "name": "MAVEN_JIB_PUBLISH_ARGS",
+          "description": "Additional [`skopeo copy` arguments](https://github.com/containers/skopeo/blob/master/docs/skopeo-copy.1.md#options)"
+        }
+      ]
+    },
+    {
+      "id": "vault",
+      "name": "Vault",
+      "description": "Retrieve secrets from a [Vault](https://www.vaultproject.io/) server",
+      "template_path": "templates/gitlab-ci-maven-vault.yml",
+      "variables": [
+        {
+          "name": "TBC_VAULT_IMAGE",
+          "description": "The [Vault Secrets Provider](https://gitlab.com/to-be-continuous/tools/vault-secrets-provider) image to use",
+          "default": "registry.gitlab.com/to-be-continuous/tools/vault-secrets-provider:master",
+          "advanced": true
+        },
+        {
+          "name": "VAULT_BASE_URL",
+          "description": "The Vault server base API url"
+        },
+        {
+          "name": "VAULT_OIDC_AUD",
+          "description": "The `aud` claim for the JWT",
+          "default": "$CI_SERVER_URL"
+        },
+        {
+          "name": "VAULT_ROLE_ID",
+          "description": "The [AppRole](https://www.vaultproject.io/docs/auth/approle) RoleID",
+          "secret": true
+        },
+        {
+          "name": "VAULT_SECRET_ID",
+          "description": "The [AppRole](https://www.vaultproject.io/docs/auth/approle) SecretID",
+          "secret": true
+        }
+      ]
+    }
+  ]
+}

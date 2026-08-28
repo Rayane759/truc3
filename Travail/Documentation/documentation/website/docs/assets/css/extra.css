@@ -1,0 +1,124 @@
+/* ==========================================================================
+   Variables adaptatives clair / sombre
+   Material écrit le thème actif dans body[data-md-color-scheme] :
+   "default" = clair, "slate" = sombre.
+   ========================================================================== */
+
+:root,
+[data-md-color-scheme="default"] {
+  --hero-gradient-start: var(--md-primary-fg-color);
+  --hero-gradient-end: var(--md-primary-fg-color--dark);
+  --hero-fg: #ffffff;
+  --hero-fg-muted: rgba(255, 255, 255, 0.9);
+  --card-shadow: rgba(0, 0, 0, 0.12);
+}
+
+[data-md-color-scheme="slate"] {
+  /* Dégradé plus sobre en mode sombre pour éviter un bloc trop lumineux */
+  --hero-gradient-start: var(--md-primary-fg-color--dark);
+  --hero-gradient-end: var(--md-default-bg-color);
+  --hero-fg: rgba(255, 255, 255, 0.95);
+  --hero-fg-muted: rgba(255, 255, 255, 0.7);
+  --card-shadow: rgba(0, 0, 0, 0.55);
+}
+
+
+/* HERO */
+
+.hero {
+  background: linear-gradient(
+    180deg,
+    var(--hero-gradient-start),
+    var(--hero-gradient-end)
+  );
+  color: var(--hero-fg);
+  padding: 4rem 2rem;
+  margin: -1rem -1rem 2rem -1rem;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: -3rem;
+}
+
+.hero-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: auto;
+  gap: 2rem;
+}
+
+.hero-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hero-image {
+  flex: 1;
+  text-align: right;
+}
+
+.hero-image img {
+  max-width: 320px;
+}
+
+.hero h1 {
+  color: var(--hero-fg);
+  font-size: 5rem;
+}
+
+.hero p,
+.hero .hero-text span:not(.typewriter) {
+  font-size: 1.25rem;
+  color: var(--hero-fg-muted);
+}
+
+.hero .md-button {
+  margin: 0.5rem;
+}
+
+
+/* TYPEWRITER */
+
+
+.typewriter::after {
+  content: "|";
+  margin-left: 6px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%,50%,100% {opacity:1;}
+  25%,75% {opacity:0;}
+}
+
+
+/* CARDS */
+
+.grid.cards {
+  margin-top: 2rem;
+}
+
+.icon {
+  font-size: 28px;
+  color: var(--md-primary-fg-color);
+}
+
+
+/* HOVER EFFECT */
+
+.md-typeset .grid.cards > ul > li {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.md-typeset .grid.cards > ul > li:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px var(--card-shadow);
+}

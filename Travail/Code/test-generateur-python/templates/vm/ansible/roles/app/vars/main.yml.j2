@@ -1,0 +1,24 @@
+---
+# Identité
+app_name:    "{{ appName }}"
+team_name:   "{{ teamName }}"
+environment: "{{ environnement }}"
+app_port:    {{ appPort }}
+app_user:    "{{ appUser }}"
+
+# Nexus — source de l'artefact
+nexus_url:        "{{ nexusUrl }}"
+nexus_repository: "{{ nexusRepository }}"
+artifact_format:  "{{ artifactFormat }}"
+artifact_name:    "{{ appName }}"
+artifact_version: "{{ '{{ artifact_version | default(\"latest\") }}' }}"
+
+# Variables d'environnement applicatives
+app_env:
+{% if configEnv %}
+{% for k, v in configEnv.items() %}
+  {{ k }}: "{{ v }}"
+{% endfor %}
+{% else %}
+  {}
+{% endif %}

@@ -1,0 +1,53 @@
+# Compte‑rendu d’interview – Refondation des catalogues de services INSEE  
+*(interview anonyme – 1 participant, 45 min, réalisé le 24/04/2026)*  
+
+---  
+
+## 1. Synthèse des points positifs & irritants / incohérences  
+*(format « protopersona » – résumé des besoins, frustrations et attentes exprimées)*  
+
+| **Catégorie** | **Ce qui fonctionne / points positifs** | **Irritants / incohérences** | **Implications UX** |
+|---------------|------------------------------------------|------------------------------|----------------------|
+| **Accès & découverte** | - La plupart des équipes connaissent déjà l’existence d’un catalogue dédié à leur périmètre. <br>- Certaines plateformes (ex. GitLab) offrent une recherche en texte plein qui permet de retrouver rapidement un fichier technique. | - Multiplicité des points d’accès (GitLab, URL directe, DPII Planet, SharePoint…) oblige les usagers à connaître la « porte d’entrée » exacte. <br>- Pas de page d’accueil unifiée qui indique où chercher selon le type de besoin (ex. documentation fonctionnelle vs technique). | - Besoin d’un **hub central** qui redirige ou agrège les sources. |
+| **Ergonomie & navigation** | - Les catalogues les plus anciens (ex. sur GitLab) ont une structure de dossiers logique pour les équipes qui les maintiennent. | - Absence d’un fil d’Ariane ou de menus globaux ; navigation souvent « en profondeur » (5‑6 niveaux) qui décourage la découverte. <br>- Incohérence des libellés : même notion désignée différemment d’une plateforme à l’autre (ex. “ModOp”, “Modèle Opérationnel”, “MO”). | - Nécessité d’une **taxonomie commune** et d’un **design system** pour les libellés. |
+| **Sémantique & profondeur de contenu** | - La documentation technique (API, schémas de données) est généralement très complète lorsqu’elle est maintenue. | - Le même service peut être décrit à plusieurs endroits avec des niveaux de détail très différents (ex. description courte sur DPII Planet vs description exhaustive sur GitLab). <br>- Absence de métadonnées normalisées (tags, version, propriétaire) qui rend la recherche difficile. | - Mettre en place **méta‑données obligatoires** pour chaque entrée. |
+| **Recherche** | - La recherche native de GitLab renvoie rapidement les fichiers contenant le mot‑clé exact. | - Recherche globale impossible : chaque plateforme possède son propre moteur, aucun agrégateur. <br>- Les filtres (date, équipe, type de document) ne sont pas uniformes. | - Un **moteur de recherche transversal** avec filtres communs. |
+| **Responsabilité & gouvernance** | - Les équipes savent qui est le « owner » du service qu’elles maintiennent. | - Pas de visibilité claire sur les équipes responsables d’un service lorsqu’il est listé sur une plateforme tierce. <br>- Les limites de service (périmètre fonctionnel, SLA) sont parfois absentes ou dispersées. | - Un **champ « Responsable »** visible dans chaque fiche service. |
+| **Mise à jour & versioning** | - Sur GitLab, le versionnage est automatique grâce aux commits. | - Sur les URL directes ou DPII Planet, aucune trace de version, ce qui crée des ambiguïtés sur la validité du contenu. | - Uniformiser le **versioning** (ex. numéro de version + date) sur toutes les plateformes. |
+| **Support & formation** | - Certains services proposent des guides d’onboarding très détaillés. | - Pas de documentation centralisée sur « comment utiliser le catalogue » → les nouveaux arrivants se perdent. | - Créer un **guide d’utilisation** unique et accessible dès la première connexion. |
+
+---
+
+## 2. CR des échanges  
+
+| **Thème abordé** | **Extraits (anonymisés)** | **Analyse** |
+|------------------|---------------------------|-------------|
+| **Multiplicité des plateformes** | “Je sais que le service X est sur GitLab, mais le même service apparaît aussi sur DPII Planet, et parfois même sur un simple lien partagé.” | L’interviewé souligne la **dispersion** des informations, source de perte de temps et d’erreurs. |
+| **Recherche** | “Quand je tape le nom du service dans le moteur de recherche de GitLab, ça marche, mais si je ne sais pas où chercher, je perds du temps à tester chaque plateforme.” | Manque d’**outil de recherche unifié**. |
+| **Taxonomie et libellés** | “On parle de ‘ModOp’ dans un catalogue, mais d’‘Opérationnel Model’ dans un autre. Ça crée de la confusion, surtout pour les nouveaux.” | **Incohérence sémantique** qui nuit à la compréhension. |
+| **Navigation profonde** | “Pour arriver à la doc technique, je dois cliquer sur trois dossiers, puis sur un sous‑dossier, puis sur un fichier PDF. Si je ne connais pas la structure, je ne trouve rien.” | **Barrières de navigation** dues à une arborescence trop profonde et non guidée. |
+| **Métadonnées et visibilité du propriétaire** | “Sur GitLab, le propriétaire du repo est indiqué, mais sur DPII Planet, il n’y a aucune mention. Du coup, quand j’ai une question, je ne sais pas à qui m’adresser.” | **Absence de métadonnées** normalisées (owner, version, SLA). |
+| **Mise à jour du contenu** | “Le fichier PDF que j’ai téléchargé il y a six mois n’est plus à jour, mais il n’y a aucune indication de version ou de date de mise à jour.” | **Manque de versioning** et de signalement de l’obsolescence. |
+| **Ergonomie globale** | “Il n’y a pas de page d’accueil qui me dise où je dois aller selon mon besoin (ex. je cherche la documentation fonctionnelle ou les limites du service).” | Besoin d’une **page d’accueil centrale** avec des chemins de navigation clairs. |
+| **Formation / onboarding** | “Quand j’ai rejoint l’équipe, personne ne m’a expliqué comment fonctionnent les catalogues. J’ai dû me débrouiller en demandant à plusieurs collègues.” | Absence de **guide d’onboarding** ou de formation officielle. |
+| **Valeur perçue** | “Je sais que les catalogues existent, mais je les utilise rarement parce que je ne suis pas sûr de trouver ce que je cherche.” | **Faible adoption** liée aux irritants identifiés. |
+
+---
+
+## 3. Autres éléments observés  
+
+* **Variabilité des formats** – Certains services sont décrits sous forme de pages HTML, d’autres sous forme de fichiers Markdown, PDF ou même de tickets JIRA. Cette hétérogénéité complique la lecture et la recherche.  
+* **Gestion des accès** – Les droits d’accès diffèrent d’une plateforme à l’autre (ex. accès restreint sur GitLab vs accès public sur DPII Planet), ce qui crée des blocages pour les utilisateurs qui ne disposent pas des droits appropriés.  
+* **Absence de métriques d’usage** – Aucun tableau de bord ou indicateur ne montre la fréquence d’accès ou les pages les plus consultées, ce qui empêche d’identifier les contenus réellement utiles.  
+* **Processus de gouvernance** – L’interviewé mentionne que chaque équipe gère son propre catalogue de façon autonome, sans coordination centrale, ce qui explique la **fragmentation** actuelle.  
+* **Support multilingue** – Aucun des catalogues ne propose de version en anglais, alors que certains utilisateurs (partenaires externes, consultants) en auraient besoin.  
+
+---  
+
+> **Note** : Ce compte‑rendu se veut strictement factuel. Aucune recommandation, feuille de route ou décision de conception n’est proposée à ce stade.  
+
+---  
+
+*Document préparé par :*  
+**[Nom du UX Designer]** – UX Designer, mission de refonte des catalogues de services INSEE  
+*Date :* 28 avril 2026  

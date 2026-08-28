@@ -1,0 +1,50 @@
+Notes réunion 19/03/2026 : Architecture
+
+Intervenants :
+	Nicolas Valembois
+	Laurent De Loitière
+	Sylvain Martin
+	(Rémi Pépin)
+	(???)
+	
+Les devs, niveau prod, font tout le temps la même chose, machinalement.
+
+Dans ses activités (dont à Nantes), Donatien veut estimer avec les devs le temps nécessaire pour réaliser certains blocs de tâches
+Il y aura 2 parties : Des tâches sans Plateforme, puis des tâches avec une Plateforme.
+
+Le tableau avec des cases jaunes de Donatien est très bien pour faire une base pour un Golden Path pour voir les points de tension importants.
+
+(Mise en place d'un job de sauvegarde (pour dupliquer les données de prod en hors-prod) : Les devs ? Le DBA ? Ca gêne le DSI ?)
+Il y a aussi l'idée de créer une sandbox pour ça
+
+
+Ensuite, on a parlé des interviews.
+La question de "C'est quoi une plateforme ?" est utile pour les Golden Paths pour voir ce qu'ils attendent.
+Il y a une note de ... qui est passée ? (Il y a 4-5 ans ??)
+
+De même au niveau des interviews, pas mal de questions sont orientées pour capter les difficultés présentes pour les devs au niveau OPS/Prod. Et c'est bien.
+
+
+Pour les premiers Golden Path, les résultats de sondage permettent déjà de connaître les premiers points de tension de KubeApp (et bientôt IAHS)
+
+
+L'ADR 'Organisation Cible' est très bien niveau architecture et tout (à compléter avec les retours des devs après les interviews de Donatien)
+
+
+Modèle Spotify et fonctionnement GUILD (???)
+Le fonctionnement en Guilde/Forum marche pas très bien à l'INSEE apparemment ?
+
+Les équipes typées comme "Capabilities" sont censées être en priorité travailler sur la Plateforme (en gros), mais
+en principe elle peut aussi être autonome en dehors de ça.
+Pour cela (et éviter que l'équipe DevExp ait des responsabilités "énormes"), il faut un PO/PM qui gère les priorités.
+De même (sur le schéma de la Solution 2), il peut y avoir 2 équipes dans un bloc (genre 2 équipes Observabilité) et tout.
+Aussi, il peut être intéressant d'avoir des experts (ou 1) 
+Le schéma peut évoluer pour ajouter une autre équipe au niveau de "l'équipe DevExp" ... Faut voir
+
+Un objectif global est de s'éloigner du monde des OPS.
+Un autre objectif est d'avoir une doc centrale, à jour. 
+
+
+On peut aussi collecter toutes les docs de la prod, puis laisser Backstage crawler. Mais a priori c'est un choix qui sera fait plus tard
+
+On peut beaucoup s'inspirer de ce qu'a fait Donatien sur le "portail-devexp.developpment.insee.fr"

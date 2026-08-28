@@ -1,0 +1,8 @@
+apiVersion: pkg.crossplane.io/v1
+kind: Function
+metadata:
+  name: crossplane-contrib-function-environment-configs
+spec:
+  package: gitlab-registry.insee.fr/kubernetes/kubeqfapp/poc/crossplane/crossplane-contrib/function-environment-configs:v0.7.2
+  packagePullSecrets:
+    - name: registry-gitlab-insee-fr-pull-secret

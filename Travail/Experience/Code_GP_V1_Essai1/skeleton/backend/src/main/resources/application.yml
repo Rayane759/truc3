@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: ${{ values.name }}
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/db
+    username: ${username}
+    password: ${password}
+
+  cloud:
+    vault:
+      uri: http://vault:8200
+      authentication: KUBERNETES
+      kv:
+        backend: secret
+        application-name: backend/${{ values.name }}/dev
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus

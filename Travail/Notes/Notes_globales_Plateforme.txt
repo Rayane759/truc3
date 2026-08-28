@@ -1,0 +1,58 @@
+Organisation de la Plateforme
+
+On applique les concepts de TeamTopology qui repose sur 4 types d'équipes :
+	Stream-aligned (produit => équipes développement à l'Insee)
+    Platform (services internes => les équipes de la roue de la prod)
+    Enabling (équipes support => architectes, urbaniste, sécurité,...)
+    Complicated-subsystem (équipes type expertise => la diit, les archis).
+
+Une équipe "DevExp" qui sert d'interface pour les devs, et qui peut s'appuyer sur d'autres équipes "Capabilities" : 
+    Compute & Runtime: IDDA + KubeApp
+    Identity & Security: IAHS
+    Data Services: PDD
+    Reliability & Feedback : OBSERVABILITÉ
+    (Plateform Experience) : à définir
+
+Ces équipes, en théorie, ne reçoivent plus de tickets des devs directement, mais de la part de l'équipe DevExp.
+
+Il y a des équipes plus bas niveau que ces équipes "Capabilities", mais on peut voir ça plus tard.
+
+
+Pour ça, il faudra faire un gros travail sur la documentation, à la fois de la plateforme (pour les devs) mais aussi des équipes supports (pour les DevExp)
+
+
+Perimètre de l'équipe PlatformExperience : - Golden path - Templates service - CI/CD standard - Developer Portal (intégration de la doc des autres capabilities) - UX développeur (gitlab / gitlab runner / nexus) - Documentation centralisée de la plateforme - les outils self-service (pour le MCO/MCS)
+
+Périmètre de l'équipe Runtime : - Kubernetes - GitOps - Ingress - Scaling - Operators - Automatisation infra - Ordonnanceur
+
+Périmètre de l'équipe Security: - Provider OIDC : clients, tout ce qui tourne autour - Gestion des droits (IAM as a service) - Gestion des coffres de secrets. - Gestion des annuaires
+
+Périmètre de l'équipe Data Services: - BDD as code - S3 as code - Gestion des accès - Modèle de base de données (BDD + backup + monitoring + outils diagnostic)
+
+Périmètre de l'équipe Observabilité: - Fournir la stack d'observabilité - Tenant automatisé - Modèle d'alerting - Supervision
+
+Chacune des équipes contribue avec ses modèles/Template dans l'outil de la PlateformExperience. L'équipe PlateformeExperience assemble les briques des différentes équipes et est responsable de leur intégration dans les outils fournis en self-service. L'équipe PlateformeExperience
+Responsabilité des équipes infrastructures layer¶
+
+Les équipes de la partie infrastructure layer sont des équipes dont les clients sont les capabilities team, elles ne sont jamais en contact avec les développeurs.
+
+Elles proposent:
+
+    Des APIs stables
+    De l'IAC pour les capabilities team
+
+
+
+
+Technologies / Outils :
+
+Sécurité :
+	RBAC : Des rôles pour accéder aux services
+Observabilité : (Ce serait bien que ce soit centralisé d'ailleurs)
+	Tracking : Point de vue "efficacité" (Coût / Capacité)
+	Métriques : Performance
+	Monitoring : Santé
+Autre : 
+	Idempotence des workflows 
+Autres (?) :
+	APIs contractuelles

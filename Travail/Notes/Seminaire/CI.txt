@@ -1,0 +1,36 @@
+"""
+default:
+	interruptible: true
+"""	
+
+Dans les paramètres sur l'UI Gitlab dans CI/CD, on peut cocher des options pour améliorer la sobriété/performance de notre CI
+
+"""
+artifacs:
+	paths:
+		- .m2/repository
+"""
+
+On peut aussi mettre des jobs très longs à la fin, voire en "manual" 
+
+Aussi, quand on est en dev, on est pas obligé de faire tourner la CI à chaque commit
+
+Apparemment, le "dependancies" est l'ancêtre de "needs", il a plus d'inconvénients donc il faudrait aller vers "needs" ... Mais c'est du détail on dirait
+
+
+Pour la lisibilité, on peut mettre une "encre" (ou "ancre"), qu'on peut appeler dans un job pour raccourcir un job (ex : "Encre" sur "rules", qu'on appelle partout
+où on en a besoin plutôt que de les réecrire à chaque fois).
+
+De même, il y a les extends.
+
+On peut aussi mettre des trucs dans le "default" au lieu de les répeter partout, et les surcharger seulement si besoin
+
+Enfin, on peut aussi mettre des "expose_as" et des "coverage", ça peut être stylé (même si Sonar le fait déjà en vrai)
+
+
+Job : Check branch alignment (Component INSEE
+Très rapide et fait ggner beaucoup de temps : Vérifie que le dev a bien fait un rebase, etc.
+
+
+
+sndi-nantes/pr-presentations.atelier-ci-seminaire-dev-2026

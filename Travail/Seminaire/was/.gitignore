@@ -1,0 +1,20 @@
+# idea
+.idea
+
+# Async profiler directory
+async-*
+
+# Async profiler results
+# Wall time
+wall-*.html
+
+# Memory
+memory.html
+
+# CPU
+cpu*.html
+cpu-itimer.html
+/mise.toml
+
+# JFR
+**/*.jfr

@@ -1,0 +1,121 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xhelmapps.platform.example.org
+spec:
+  group: platform.example.org
+  names:
+    kind: XHelmApp
+    plural: xhelmapps
+  claimNames:
+    kind: HelmApp
+    plural: helmapps
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                parameters:
+                  type: object
+                  properties:
+
+                    namespace:
+                      type: string
+                      description: Namespace cible du déploiement
+
+                    replicaCount:
+                      type: integer
+                      description: Nombre de pods à déployer en simultané
+                      default: 2
+                      minimum: 1
+
+                    type:
+                      type: string
+                      description: Type de workload (Deployment ou StatefulSet)
+                      default: Deployment
+                      enum: ["Deployment", "StatefulSet"]
+
+                    image:
+                      type: object
+                      description: Configuration de l'image du conteneur principal
+                      properties:
+                        repository:
+                          type: string
+                          description: URL du registry/image
+                        tag:
+                          type: string
+                          description: Tag de l'image
+                          default: "main"
+                        pullPolicy:
+                          type: string
+                          description: Politique de récupération de l'image
+                          default: IfNotPresent
+                          enum: ["Always", "IfNotPresent", "Never"]
+                      required:
+                        - repository
+
+                    resources:
+                      type: object
+                      description: Ressources CPU/RAM (requests = réservé, limits = maximum)
+                      properties:
+                        requests:
+                          type: object
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                        limits:
+                          type: object
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                              
+                    service:
+                      type: object
+                      description: Configuration du Service Kubernetes exposant l'application
+                      properties:
+                        port:
+                          type: integer
+                          description: Port exposé par le service
+                          default: 8080
+                        type:
+                          type: string
+                          description: Type de Service Kubernetes
+                          default: ClusterIP
+                          enum: ["ClusterIP", "NodePort", "LoadBalancer"]
+
+                    env:
+                      type: object
+                      description: Variables d'environnement non-sensibles (clé/valeur)
+                      x-kubernetes-preserve-unknown-fields: true
+                      # Pour dire qu'on accepte n'importe quelle paire clé/valeur sans valider la structure interne de ce champ
+
+                    values:
+                      type: object
+                      description: >-
+                        Values Helm additionnelles pour tout paramètre non couvert
+                        par les champs structurés ci-dessus (ingress, autoscaling,
+                        probes, networkPolicy, etc.)
+                      x-kubernetes-preserve-unknown-fields: true
+
+                  required:
+                    - namespace
+                    - image
+              required:
+                - parameters
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+              properties:
+                releaseState:
+                  type: string
+                  description: État du Release Helm sous-jacent (deployed, failed, ...)

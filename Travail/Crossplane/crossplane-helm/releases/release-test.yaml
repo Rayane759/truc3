@@ -1,0 +1,16 @@
+apiVersion: helm.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: test-podinfo
+spec:
+  forProvider:
+    chart:
+      name: podinfo
+      repository: https://stefanprodan.github.io/podinfo
+      version: "6.7.1"
+    namespace: test-podinfo
+    skipCreateNamespace: false
+    values:
+      replicaCount: 2
+  providerConfigRef:
+    name: default

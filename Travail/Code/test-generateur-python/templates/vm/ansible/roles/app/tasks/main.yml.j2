@@ -1,0 +1,94 @@
+---
+# ── Préparation système ──────────────────────────────────────
+- name: Créer l'utilisateur applicatif
+  user:
+    name: "{{ '{{ app_user }}' }}"
+    shell: /bin/bash
+    create_home: true
+    system: true
+
+- name: Créer le répertoire d'installation
+  file:
+    path: "/opt/{{ '{{ app_name }}' }}"
+    state: directory
+    owner: "{{ '{{ app_user }}' }}"
+    mode: "0755"
+
+- name: Créer le répertoire de logs
+  file:
+    path: "/var/log/{{ '{{ app_name }}' }}"
+    state: directory
+    owner: "{{ '{{ app_user }}' }}"
+    mode: "0755"
+
+# ── Installation des dépendances ─────────────────────────────
+- name: Installer Java (si artefact JAR)
+  apt:
+    name: openjdk-17-jre-headless
+    state: present
+    update_cache: true
+  when: artifact_format == "jar"
+
+- name: Installer Docker (si artefact image)
+  block:
+    - apt:
+        name: [docker.io, docker-compose-v2]
+        state: present
+    - service:
+        name: docker
+        state: started
+        enabled: true
+  when: artifact_format == "docker"
+
+# ── Téléchargement depuis Nexus ──────────────────────────────
+- name: Télécharger l'artefact JAR depuis Nexus
+  get_url:
+    url: "{{ '{{ nexus_url }}' }}/repository/{{ '{{ nexus_repository }}' }}/{{ '{{ artifact_name }}' }}/{{ '{{ artifact_version }}' }}/{{ '{{ artifact_name }}-{{ artifact_version }}.jar' }}"
+    dest: "/opt/{{ '{{ app_name }}' }}/app.jar"
+    owner: "{{ '{{ app_user }}' }}"
+    mode: "0644"
+  when: artifact_format == "jar"
+  notify: restart app
+
+- name: Puller l'image Docker depuis Nexus
+  community.docker.docker_image:
+    name: "{{ '{{ nexus_url }}' }}/{{ '{{ nexus_repository }}' }}/{{ '{{ artifact_name }}:{{ artifact_version }}' }}"
+    source: pull
+  when: artifact_format == "docker"
+  notify: restart app
+
+# ── Configuration ────────────────────────────────────────────
+- name: Déployer le fichier de variables d'environnement
+  template:
+    src: app.env.j2
+    dest: "/opt/{{ '{{ app_name }}' }}/.env"
+    owner: "{{ '{{ app_user }}' }}"
+    mode: "0600"
+  notify: restart app
+
+- name: Déployer le service systemd
+  template:
+    src: app.service.j2
+    dest: "/etc/systemd/system/{{ '{{ app_name }}' }}.service"
+    mode: "0644"
+  notify:
+    - reload systemd
+    - restart app
+
+# ── Activation ───────────────────────────────────────────────
+- name: Activer et démarrer le service
+  systemd:
+    name: "{{ '{{ app_name }}' }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+
+handlers:
+  - name: reload systemd
+    systemd:
+      daemon_reload: true
+
+  - name: restart app
+    systemd:
+      name: "{{ '{{ app_name }}' }}"
+      state: restarted

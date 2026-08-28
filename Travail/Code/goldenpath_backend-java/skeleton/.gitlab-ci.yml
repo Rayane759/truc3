@@ -1,0 +1,48 @@
+default:
+  image: gitlab-registry.insee.fr/kubernetes/images/build/maven-jdk:21
+  tags:
+  - docker
+
+stages:
+- build
+- docker
+
+include:
+- project: "kubernetes/kubeapp/ci-templates"
+  ref: main
+  file:
+  - "images.yaml"
+  - "utils.yaml"
+
+job_build:
+  stage: build
+  script:
+  - mvn clean verify
+  artifacts:
+    expire_in: 1 week
+    when: always # permet d'avoir le rapport même quand les tests échouent
+    paths:
+    - ./target/ROOT.jar
+
+build-docker:
+  stage: docker
+  extends: .template:docker_build
+  variables:
+    PATH_TO_DOCKERFILE: Dockerfile
+
+test-docker:
+  stage: docker
+  extends: .template:docker_check
+  needs:
+  - build-docker
+  variables:
+    SEVERITY_LEVELS: HIGH,CRITICAL # valeurs possibles (les séparer par une virgule) : CRITICAL HIGH MEDIUM LOW
+  allow_failure: true
+
+release-docker:
+  stage: docker
+  extends: .template:docker_push_internal
+  needs:
+  - build-docker
+  variables:
+    IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}

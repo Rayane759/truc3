@@ -1,0 +1,3 @@
+apiVersion: v2
+name: gp-java-service-test17-cond
+version: 0.1.0

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":disableDependencyDashboard"
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "gitlab-tags"
+      ],
+      "versioning": "docker"
+    },
+    {
+      "groupName": "to-be-continuous dependencies",
+      "groupSlug": "tbc-deps",
+      "matchPackagePatterns": [
+        "to-be-continuous/*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true,
+      "rebaseWhen": "auto"
+     }
+  ]
+}

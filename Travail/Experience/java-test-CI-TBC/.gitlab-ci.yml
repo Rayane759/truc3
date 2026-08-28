@@ -1,0 +1,123 @@
+default:
+  image: gitlab-registry.insee.fr/kubernetes/images/build/maven-jdk-toolbox:21
+  tags:
+  - docker
+
+stages:
+- 🎨 Formatting
+- 📦 Build
+- 📈 Metrics
+- 🔒 Security
+- test
+- 🚚 Release
+- 🚀 Deploy
+
+variables:
+  MAVEN_TEST_OPTS: >-
+    -Dspring.datasource.driver-class-name=org.h2.Driver -Dspring.datasource.url=jdbc:h2:mem:testdb -Dlogging.level.root=WARN -Dlogging.level.fr.insee=INFO
+
+# Components
+include:
+# To Be Continuous : Maven Component (alors peut etre)
+- component: $CI_SERVER_FQDN/platform-engineering/poc/components/maven-component/gitlab-ci-maven@0.3.0
+  inputs:
+    image: gitlab-registry.insee.fr:443/kubernetes/images/build/maven-jdk:21
+    deploy-enabled: true
+- component: gitlab.insee.fr/kubernetes/kubeapp/components/docker/gitlab-ci-docker-lint-component@0.0.2
+  inputs:
+    stage: "🎨 Formatting"
+    path_to_dockerfile: "Dockerfile"
+- component: gitlab.insee.fr/kubernetes/kubeapp/components/docker/gitlab-ci-docker-build-component@0.0.2
+  inputs:
+    stage: "📦 Build"
+    path_to_dockerfile: "Dockerfile" # Optionnel
+- component: gitlab.insee.fr/dsi/analyzer/composants/gitlab-ci-gitleaks-component/scan@1.0.0
+  inputs:
+    stage: "🔒 Security"
+# - component: gitlab.insee.fr/dsi/analyzer/composants/gitlab-ci-trivy-component/scan@2.0.0
+#   inputs:
+#     stage: 🔒 Security
+#     fail_on_severity: "CRITICAL|HIGH"
+#     rules:
+#       - when: manual
+#         allow_failure: true
+- component: gitlab.insee.fr/kubernetes/kubeapp/components/docker/gitlab-ci-docker-check-component@0.0.2
+  inputs:
+    trivy_path_to_trivyignore: "" # Optionnel
+    stage: 🔒 Security
+    allow_failure: true
+    dependencies: [ docker-build ]
+- component: gitlab.insee.fr/kubernetes/kubeapp/components/docker/gitlab-ci-docker-push-component@0.0.2
+  inputs:
+    stage: 🚚 Release
+    push_image_registry: "${CI_REGISTRY_IMAGE}"
+    push_image_tags: "${CI_COMMIT_REF_NAME}"
+    tar_path: "image.tar"
+    dependencies: [ docker-build ]
+# - component: gitlab.insee.fr/kubernetes/kubeapp/components/gitops-yaml-value-updater/component@2.0.0
+#   inputs:
+#     stage: 🚀 Deploy
+#     repository: "https://gitlab.insee.fr/path/to/depot-gitops.git"
+#     branch: "main"
+#     file_to_change: "apps/ihm-react-ts/dv2/values.yaml"
+#     key_to_change: "ihm-react-ts.image.tag"
+#     new_value: "$IMAGE_SHA"
+#     username: "bot-gitlab"
+#     password_var: "${BOT_GITLAB_TOKEN}"
+#     automerge: "true"
+#     job-prefix: "update-dv2-"
+
+
+maven-build:
+  stage: "📦 Build"
+  script:
+  - mvn $MAVEN_CLI_OPTS clean verify -DskipTests
+  artifacts:
+    paths:
+    - target/*.jar
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+    - .m2/repository
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+maven-test:
+  stage: test
+  script:
+  - mvn $MAVEN_CLI_OPTS clean verify
+  artifacts:
+    expire_in: 1 week
+    when: always # permet d'avoir le rapport même quand les tests échouent
+    paths:
+    - ./rapport-cucumber.html
+    - ./target/ROOT.jar
+    reports:
+      junit: ./target/junit.xml
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+########################################
+# 📈 Metrics — Analyse qualité SonarQube
+########################################
+sonarqube:
+  stage: 📈 Metrics
+  script:
+  - echo "Analyse SONAR et envoi sur $SONAR_HOST_URL du projet [${CI_PROJECT_PATH}], PROJECT_ID=[${CI_PROJECT_ID}]  ${CI_COMMIT_BRANCH}"
+  - >-
+    mvn clean verify sonar:sonar -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.token=${SONAR_TOKEN} -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.branch.name=${CI_COMMIT_BRANCH} $MAVEN_TEST_OPTS
+  except:
+  - tags
+  allow_failure: true
+
+sonarqube_mr:
+  stage: 📈 Metrics
+  script:
+  - echo "Analyse SONAR et envoi sur $SONAR_HOST_URL du projet [${CI_PROJECT_PATH}], PROJECT_ID=[${CI_PROJECT_ID}]  ${CI_COMMIT_REF_NAME}"
+  - >-
+    mvn clean verify sonar:sonar -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.token=$SONAR_TOKEN -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.pullrequest.key=$CI_MERGE_REQUEST_IID -Dsonar.pullrequest.branch=${CI_COMMIT_REF_NAME} -Dsonar.pullrequest.base=main $MAVEN_TEST_OPTS
+  rules:
+  - if: "$CI_MERGE_REQUEST_IID"
+  allow_failure: true

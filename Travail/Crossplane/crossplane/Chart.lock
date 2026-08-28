@@ -1,0 +1,6 @@
+dependencies:
+- name: crossplane
+  repository: https://nexus.insee.fr/repository/charts-crossplane-io-stable/
+  version: 2.3.1
+digest: sha256:5c9c894fe6e70c077c564192e592d0a964d7fad120cd34cea4010f3b20fad646
+generated: "2026-07-07T11:27:36.3687551+02:00"

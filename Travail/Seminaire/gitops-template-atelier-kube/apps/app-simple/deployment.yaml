@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-simple
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-simple
+  template:
+    metadata:
+      labels:
+        app: app-simple
+    spec:
+      containers:
+      - name: app-simple
+        image: gitlab-registry.insee.fr/kubernetes/kubeapp/exemples/seminaire-dev/2026/creation-image:main
+        ports:
+        - name: http
+          containerPort: 8080

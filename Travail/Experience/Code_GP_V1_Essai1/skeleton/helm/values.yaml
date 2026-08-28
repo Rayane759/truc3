@@ -1,0 +1,6 @@
+image:
+  repository: registry.gitlab.com/my-group/${{ values.name }}
+  tag: latest
+
+service:
+  port: 8080

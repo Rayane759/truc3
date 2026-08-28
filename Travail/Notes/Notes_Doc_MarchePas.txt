@@ -1,0 +1,9 @@
+https://kubernetes.gitlab-pages.insee.fr/kubeapp/documentation/guide_utilisateurs/service_gestion_secrets/secrets_externes/#demande-dacc%C3%A8s-au-vault-depuis-son-namespace
+Cette URL marche pas, mais elle est indiquée sur : https://gitlab.insee.fr/kubernetes/kubeapp/suivi-des-demandes/-/issues/new?description_template=Demande_creation_namespace
+
+https://gitlab.insee.fr/iahs/secrets/documentation/doc-publique/-/wikis/Utilisation/Acc%C3%A9der-%C3%A0-l-application-web-Vault
+Le bouton "Avoir un accès valide à Vault" marche pas et renvoie sur la page d'accueil du site
+
+https://vault-horsprod-dc2.insee.fr/ui/vault/auth?with=oidc_dc2/
+Apparemment (d'après : https://gitlab.insee.fr/iahs/secrets/documentation/doc-publique/-/wikis/Souscription/Demande-d'acc%C3%A8s#pour-demander-un-acc%C3%A8s-de-type-dev-sur-un-quartier-de-secrets-dexploitant-il-convient-de-sadresser-%C3%A0-votre-chef-de-groupe)
+il faut s'adresser au chef de groupe ...

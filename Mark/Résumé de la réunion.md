@@ -1,0 +1,10 @@
+# Résumé de la réunion  
+
+| 🎯 **Objectif** | Anticiper le choix de l’outil qui servira de **Developer Portal / IDP** *Platform Engineering*. L'objectif étant d'être operationnel assez rapidement après septembre. |
+|---|---|
+| 👥 **Participants** | Donatien, Equipe IDDA, PO IDDA, futur membre IDDA: Paul et Jean-Baptiste, Future PO IDDA: Floriane |  |
+| **Choix de l'outil** | ✅ **Backstage** (open‑source, CNCF) <br>• Front React, back Node.js, déployable en interne (Docker/K8s). <br>• Architecture “coquille vide” → plugins (ArgoCD, GitLab, Swagger, etc.). <br>• Gestion déclarative via `catalog‑info.yaml`. <br>• Catalogue centralisé, docs auto‑sync, recherche transversale, annonces, notifications. <br>• Scaffolder → génération de dépôts/template (golden‑path) avec formulaire déclarable en YAML. <br>• Gestion des droits via OIDC (groupes). |  |
+| 🛠️ **Alternatives étudiées** | Pulumi (IDP limité), Microsoft DevBox, AWS Proton, Port, Harness (SaaS payant) – rejetées car non‑open‑source, licence ou trop orientées cloud‑provider. |
+| ⚠️ **Limites / questions** | • UI jugée “vieillotte” → besoin de custom CSS/JS (développement front). <br>• Peu de thèmes/plugins UI déjà prêts (communauté plus fonctionnelle que visuelle). <br>• Compétences internes : besoin de devs React/Node pour customiser. <br>• Gestion fine des droits (qui peut créer des templates, annonces, etc.) à préciser. |
+| 📅 **Décision / prochaine étape** | - **Tester l'intégration de IAC et ansible** dans backstage (dès qu'IDDA à de la bande passante) <br> - **Validation du choix de Backstage** comme plateforme cible (déploiement du poc auprès des utilisateurs dès maintenant (vérification besoin/cohérence), démarrage des travaux coté future équipe pas avant octobre. <br>- **Préparation du document pour appel à une prestation externe** (Hippon, Capgemini ou autre) pour accompagner le déploiement, la customisation UI et la formation, idéalement à partir d’octobre. |
+| 📢 **Actions à faire** | 1. [IDDA] Prévoir créneau pour atelier <br> 2. [Donatien] Initié document de cadrage <br> 3. [Donatien] Mettre à disposition une documentation utilisateur de l'outil backstage <br>  |

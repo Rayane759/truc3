@@ -1,0 +1,52 @@
+variable "app_name" {
+  type    = string
+  default = "{{ appName }}"
+}
+
+variable "team_name" {
+  type    = string
+  default = "{{ teamName }}"
+}
+
+variable "environment" {
+  type    = string
+  default = "{{ environnement }}"
+}
+
+variable "cpu_count" {
+  type    = number
+  default = {{ vmSize.cpu }}
+}
+
+variable "ram_mb" {
+  type    = number
+  default = {{ vmSize.ram_mb }}
+}
+
+variable "disk_gb" {
+  type    = number
+  default = {{ vmSize.disk_gb }}
+}
+
+variable "vm_network" {
+  type    = string
+  default = "{{ vmNetwork }}"
+}
+
+variable "libvirt_uri" {
+  description = "URI de connexion à libvirt (ex: qemu+ssh://root@hyperviseur/system)"
+  type        = string
+  default     = "qemu:///system"
+}
+
+variable "os_image_url" {
+  description = "URL ou chemin local de l'image cloud (qcow2)"
+  type        = string
+  default     = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+}
+
+variable "ssh_public_key" {
+  description = "Clé SSH publique à injecter dans la VM"
+  type        = string
+  sensitive   = true
+}

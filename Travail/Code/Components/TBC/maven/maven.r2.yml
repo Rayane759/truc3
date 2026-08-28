@@ -1,0 +1,13 @@
+files:
+    template: ./templates/gitlab-ci-maven.yml
+    documentation: ./README.md
+    changelog: ./CHANGELOG.md
+data:
+    description: "Build, test and analyse your Maven projects"
+    public: true
+    labels:
+    - to be continuous
+    - Maven
+    - Build
+    license: LGPL v3
+    deprecated: false

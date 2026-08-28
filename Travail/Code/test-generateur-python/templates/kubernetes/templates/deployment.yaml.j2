@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: {{ workloadType }}
+metadata:
+  name: {{ appName }}
+  namespace: {{ namespace }}
+  labels:
+    app: {{ appName }}
+    team: {{ teamName }}
+    env: {{ environnement }}
+spec:
+  replicas: {{ replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ appName }}
+        team: {{ teamName }}
+        env: {{ environnement }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: {{ appName }}
+          image: "{{ imageRepository }}:{{ imageTag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ servicePort }}
+          resources:
+            requests:
+              cpu: "{{ resources.cpuReq }}"
+              memory: "{{ resources.memReq }}"
+            limits:
+              cpu: "{{ resources.cpuLim }}"
+              memory: "{{ resources.memLim }}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          {% if enableHealthProbes %}
+          livenessProbe:
+            httpGet:
+              path: {{ healthPath }}/liveness
+              port: {{ servicePort }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: {{ healthPath }}/readiness
+              port: {{ servicePort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          {% endif %}
+          {% if configEnv %}
+          envFrom:
+            - configMapRef:
+                name: {{ appName }}-config
+          {% endif %}

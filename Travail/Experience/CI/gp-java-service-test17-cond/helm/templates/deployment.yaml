@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gp-java-service-test17-cond
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gp-java-service-test17-cond
+  template:
+    metadata:
+      labels:
+        app: gp-java-service-test17-cond
+    spec:
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 8080

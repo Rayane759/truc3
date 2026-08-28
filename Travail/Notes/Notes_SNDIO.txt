@@ -1,0 +1,50 @@
+Agate : Novembre 2025. On devrait finir en août 2027 (en mode produit, donc on livre un MVP)
+
+Remplace OPALE qui sert à gérer la charge de trvaail des enquêteurs (l'appli date de 10-15 ans)
+- Travaux d'enquêtes
+- Enquête prix
+- Enquête RP
+- ...
+
+IHM pour les gestionnaires, Backend et des Batchs
+
+On va utiliser beaucoup d'API de l'INSEE :
+- API RH : Sirhius ; Pour connaître le contrat des enquêteursn leur quantité de travail, les absences
+- Prisme : Appli pour les prix
+- Geo : Le temps de trajet est compté en temps de travail (Il y a Gaia qui a été mis en place récemment)
+
+
+Pour l'IHM, on voudrait plus de "glisser/déposer" et d'auto-complétion, ... (plutôt des listes déroulantes aujourd'hui et des tableaux)
+
+IHM : React/JS
+Back : Java + SpringBoot
+Déploiement : Kube
+BDD : PostGres
+
+Formation : CSS/HTML/JS/TypeScript -> React/JS
+Archi hexagonale
+SpringBoot/Java (Patterns, SOLID)
+SQL (Surtout du CRUD)
+Kube ; CI/CD
+ArgoCD / ArgoWorkflow
+
+
+Les enquêteurs rentrent leurs congés sur OPALE, mais maintenant ils le font sur Sirhius.
+Il y a un programme R qui compare les 2 tables.
+
+
+Minh : Il a déjà fait du React (mais il reste 3 mois)
+Matthieu : Il est chaud
+Clément : Plutôt Backend
+Moi : Je devrais en faire de l'IHM (donc du React)
+
+
+Agilité : Scrum
+
+JII (Journée Inter Itération) : Revue du Sprint ("ouverte à tous"), Retro (se poser avec l'équipe pour discuter de comment on travaille), Sprint planning
+
+PO : Elle est à Lyon (Elle priorise le Backlog et tout)
+Scrum Master : S'assurer que les cérémonies se passent bien
+Business Analyst : C'était la PO, mais elle a recriuté un adjoint et 2 autres personnes à 20%
+
+Être à l'aise avec Git

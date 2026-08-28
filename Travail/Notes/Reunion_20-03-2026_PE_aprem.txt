@@ -1,0 +1,36 @@
+Réunion 20/03/2026 Après-midi : Platform Engineering
+
+Ludovic Blin & ?
+
+
+Organisation en septembre : 
+
+Equipe Plateforme : Exposent des API ou des "trucs-as-a-service". 
+
+
+Objectif de la plateforme : Minimiser les interactions lorsque le dev veut faire une action
+
+
+Solution retenue : Solution 2 (Basée sur TeamTopology)
+
+Il y a un PO dans chaque équipe (IDDA, DevExp, ...)
+
+L'équipe DevExp est presque comme une équipe d'architectes : Vision transverse pour séparer les tâches / demandes à chaque équipe.
+Elle a au maximum un profil DevOps
+
+Il faut que les équipes IDDA et tout soient orientées pour la plateforme
+
+Cible : 2-3 tickets de run par jour (sachant qu'on est quasiment 500 devs) : C'est un objectif à atteindre, il faut du travail
+
+
+Est-ce que cette solution n'écarte pas les équipes "Capabilities" des besoins des utilisateurs ?
+
+
+Le mieux serait de prioriser le monde Kube pour accélerer son adoption, mais si on peut aussi le faire pour le monde VM, tant mieux
+
+
+
+Il y a aussi une grosse partie Documentation.
+On aimerait bien une doc standardisée (MKDocs, ce qui est utilisé par KubeApp)
+
+Backstage de Donatien sur la Documentation (pour la centraliser) (portail-devexp.developpement.insee.fr)

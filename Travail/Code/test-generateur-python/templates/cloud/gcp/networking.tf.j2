@@ -1,0 +1,23 @@
+resource "google_compute_network" "main" {
+  name                    = "${local.prefix}-vpc"
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "public" {
+  name          = "${local.prefix}-subnet"
+  ip_cidr_range = "10.0.0.0/24"
+  region        = var.region
+  network       = google_compute_network.main.id
+}
+
+resource "google_compute_firewall" "app" {
+  name    = "${local.prefix}-allow-app"
+  network = google_compute_network.main.name
+
+  allow {
+    protocol = "tcp"
+    ports    = [tostring(var.app_port){% if enableHttps %}, "443"{% endif %}]
+  }
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["${local.prefix}-app"]
+}

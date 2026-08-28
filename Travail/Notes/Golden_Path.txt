@@ -1,0 +1,180 @@
+1) User
+2) Objectif
+3) Définir les étapes
+4) Fournir (Déployer et Intégrer)
+5) Mesurer et Itérer
+
+DOCUMENTATION !!!!!!! Une bonne documentation est un Golden Path
+Pour que ce soit le plus transparent possible. Aussi, c'est bien pour adapter le Golden Path à ses propres besoiins
+Un objectif des Golden Path et du Platform Engineering en général, c'est aussi d'avoir la meilleure documentation. 
+Double intérêt : Les gens ont moins de mal à chercher et trouver des infos, et ils savent à qui demander si besoin.
+En effet, d'après le sondage DevExp, un point de douleur majeur est lié à la documentation.
+Ainsi, le premier axe de développement d'une plateforme est son accessibilité (bonne documentation et peut guider vers d'autres services)
+Mais il faut pas non plus coder une vitrine ...
+
+Mode produit
+
+C'est comme un portail applicatif
+
+
+
+Il faut une plateforme avant tout. Elle permet de : 
+	Créer et run une pipeline de CI (pour encourager à le faire)
+	Déployer une application (CD)
+	
+	
+
+Les informations à collecter avant de commencer : (On peut faire des interviews, des Focus Groups, des sondages, etc)
+	A qui on s'adresse ?
+	Pourquoi ? Quels sont les points de tension principaux ? (Quel est le niveau de maîtrise des différents outils OPS (CI/CD, infra, etc))
+	Quelle est la destination ? (Application, technologie, architecture)
+	Quelles sont les bonnes pratiques (A tous les niveaux : Sécurité, Observabilité, CI/CD, Mesurabilité, ...)
+
+Il faut obtenir après des différents acteurs (Dev junior, full-stack, DevOps, architecte, respo sécurité, SRE, OPS) :
+	Les pratiques des utilisateurs (Les outils qu'ils utilisent)
+	Leurs besoins et leurs attentes (Ce qu'ils aiment ou non)
+	Leur expérience personnelle 
+	Les difficultés qu'ils ont rencontré (Points irritants / Pertes de temps / Sources de stress)
+	
+Par quoi on commence ?
+	Infrastructure : Sécurité + Observabilité <- Y intégrer les bonnes pratiques collectées auparavant
+	Pipelines : CI/CD, ... <- Y intégrer les bonnes pratiques collectées auparavant
+
+Mieux vaut un Golden Path fiable, clean et "complet".
+Il faut vraiment penser sécurité !!!!!!!
+
+Des points intéressants à évoquer lors des entretiens puis lors de la refléxion :
+	Est-ce qu'il y a des problèmes similaires à plusieurs endroits ? Qui sont réguliers ? ---> Utile pour prioriser (Côté OPS et DEV)
+	Est-ce que certaines technologies (une partie du CI/CD, une notion d'architecture, ...) posent problème ?
+		(Ils ont peur d'y toucher, un truc casse souvent, ils l'évitent, ...)
+		Est-ce que certaines bonnes pratiques sont difficiles à mettre en place ?
+	Est-ce qu'ils doivent souvent / systématiquement contacter quelqu'un ? La même personne ?
+
+Voir la page "Recueil des besoins / Analyse des demandes les plus courantes"
+Visiblement, l'IDDA récolte beaucoup de tickets (ou alors de beaucoup de tickets différents) -> ???
+
+
+IDDA : Monde VM, donc en vrai c'est pas l'objectif principal ... On se focus plutôt Kube
+	Mais s'il y a moyen de réutiliser des composants 
+
+
+
+
+
+
+
+
+Exemples de Golden Paths :
+
+1) Outils de Développement
+
+Livrables (exemples) : 
+	Templates de projets
+	Standard de code
+	Gestion des dépendances
+	Workflows
+	Git
+	Build
+	
+
+2) Pipeline CI/CD & Automatisation
+
+Livrables (exemples) :
+	Pipelines standards
+	Tests automatisés
+	Quality Gates
+	Déploiement automatisé
+	Gestion des artefacts
+	
+
+3) Infrastructure
+
+Livrables (exemples) :
+	Infrastructure standardisée (Patterns conformes aux référentiels techniques)
+	Kubernetes
+	Environnements
+	Réseau
+	Capacité à évoluer
+	
+	
+4) Sécurité 
+
+Livrables :
+	SAST / DAST (Statiques / Dynamiques) <- Vérification des CVE (si c'est pertinent ?) (Avec Analyzer) + Vérification des bonnes pratiques
+	Vérification des dépendances (SCA ?)
+	Gestion des secrets
+	RBAC (Rôles, Moindre privilège)
+	Audit trail (Enregistrement détaillé de toutes les modifications apportées aux données)
+	Sécurité réseau (cf "Point 3 : Infrastructure")
+	Scan des images Docker 
+	Vérification des environnements (Prod =/= Dev)
+	SBOM (Nomenclature logicielle) : Liste de tous les composants logiciels , les dépendances et les métadonnées d'une application
+	Monitoring (de sécurité) : Pour détecter des comportements anormaux (cf "Point 5 : Observabilité)
+	
+Comment évaluer notre sécurité : 
+	Taux de faux positifs
+	Couverture de tests
+	Couverture de scans
+	
+
+5) Observabilité
+
+Livrables :
+	Logs centralisés
+	Métriques
+	Monitoring
+	Dashboards standardisés
+	Alertes
+
+
+
+Autres exemples :
+	Base de données
+	Passage de la pré-prod à la prod (exemple)
+	Modifier la configuration d'une application (variables d'environnement)
+	Modifier une application (mise à jour, ajout de features)
+	Créer un environnement de dev
+	Revenir à des versions antérieures d'une application
+	Vérifier les différences entre 2 commits / deploy
+
+
+
+
+
+
+
+
+OUTILS : 
+
+Score (https://score.dev/) : Fichier de spécification pour configurer pas mal de choses (Docker, Kube, ...)
+	Avantages :
+		- Facile à modifier (customisation et amélioration)
+		- Déclaratif (on dit juste ce qu'on veut faire)
+
+Autre :
+
+Helm (Kubernetes) : Manifestes de configuration Kubernetes
+Kustomize (Kubernetes) : Faut voir
+	
+Grafana/Prometheus : Un outil pour monitorer et mesurer
+
+Backstage (exemple) : Bon outil si on veut faire une interface graphique pour abstraire encore plus le Golden Path.
+	Mais ce serait en dernier, ça suppose que tout le reste marche déjà bien.
+	
+Argo CD : Pour faire du CI/CD (bien), marche bien avec Kubernetes on dirait donc tant mieux
+
+Terraform : Pas le choix (je crois)
+	
+
+
+Pipelines :
+	CI/CD : Pour faire des batteries de tests et déployer en continu
+	Sécurité : Vérifier que le code qui passe par la pipeline respecte un ensemble de règles de sécurité
+	"Bonnes pratiques" : Autres vérifications plus techniques (à voir si c'est pertinent) : Bonnes versions des bons package, etc
+	
+Problématiques courantes des Golden Path / Plateformes : 
+	- Mise à jour : Si la mise à jour est rétroactive, ça casse pas tout ? Au niveau des packages ou de la vérification des fichiers, etc
+	
+	
+	
+IAHS : Secret ??

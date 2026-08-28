@@ -1,0 +1,143 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xhelmapps.platform.example.org
+spec:
+  compositeTypeRef:
+    apiVersion: platform.example.org/v1alpha1
+    kind: XHelmApp
+  mode: Pipeline
+  pipeline:
+    - step: create-helm-release
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: helm-release
+            base:
+              apiVersion: helm.crossplane.io/v1beta1
+              kind: Release
+              spec:
+                forProvider:
+                  chart:
+                    name: helm-example
+                    repository: https://gitlab.insee.fr/api/v4/projects/10954/packages/helm/stable
+                    version: "3.2.0"
+                    pullSecretRef:
+                      name: gitlab-helm-credentials
+                      namespace: crossplane-system
+                  skipCreateNamespace: false
+                  # Valeurs verrouillées côté plateforme — non modifiables par l'utilisateur via la Claim.
+                  # Elles correspondent aux bonnes pratiques de sécurité déjà présentes dans le chart.
+                  values:
+                    automountServiceAccountToken: false # values.yaml
+                    autoReloadPodWhenConfigurationChange: "ALL" # values.yaml
+                    securityContext:
+                      capabilities:
+                        drop:
+                          - ALL
+                      readOnlyRootFilesystem: true # values.yaml
+                      allowPrivilegeEscalation: false # values.yaml
+                      runAsNonRoot: true # values.yaml
+                providerConfigRef:
+                  name: default
+
+            patches:
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.namespace
+                toFieldPath: spec.forProvider.namespace
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.replicaCount
+                toFieldPath: spec.forProvider.values.replicaCount
+                policy:
+                  fromFieldPath: Optional # Si le champ n'existe pas, on ignore et on passe à la suite
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.type
+                toFieldPath: spec.forProvider.values.type
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.image.repository
+                toFieldPath: spec.forProvider.values.image.repository
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.image.tag
+                toFieldPath: spec.forProvider.values.image.tag
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.image.pullPolicy
+                toFieldPath: spec.forProvider.values.image.pullPolicy
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.resources.requests.cpu
+                toFieldPath: spec.forProvider.values.resources.requests.cpu
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.resources.requests.memory
+                toFieldPath: spec.forProvider.values.resources.requests.memory
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.resources.limits.cpu
+                toFieldPath: spec.forProvider.values.resources.limits.cpu
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.resources.limits.memory
+                toFieldPath: spec.forProvider.values.resources.limits.memory
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.service.port
+                toFieldPath: spec.forProvider.values.service.port
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.service.type
+                toFieldPath: spec.forProvider.values.service.type
+                policy:
+                  fromFieldPath: Optional
+
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.env
+                toFieldPath: spec.forProvider.values.config.env
+                policy:
+                  fromFieldPath: Optional
+
+              # Values libres (fusionnées sans écraser les champs ci-dessus)
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.values
+                toFieldPath: spec.forProvider.values
+                policy:
+                  fromFieldPath: Optional
+                  toFieldPath: MergeObjectsAppendArrays
+                  # Là c'est technique. En gros, dans ces "values libres", ça veut dire que pour
+                  # toutes les clés déjà présentes dans l'objet, les valeurs existantes sont conservées.
+                  # En particulier, ça protège les valeurs verrouillées dans le "base" du coup.
+
+              # Remontée du statut vers la XR
+              - type: ToCompositeFieldPath
+                #  Ça permet à un utilisateur qui fait `kubectl get helmapp mon-app -o yaml` de voir directement 
+                #  l'état Helm (deployed, failed, ...) sans avoir à chercher la ressource Release sous-jacente.
+                fromFieldPath: status.atProvider.state
+                toFieldPath: status.releaseState
+                policy:
+                  fromFieldPath: Optional

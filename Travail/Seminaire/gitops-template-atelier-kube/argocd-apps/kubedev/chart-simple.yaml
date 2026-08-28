@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: chart-simple
+  namespace: projet-gn93k7
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: projet-gn93k7
+    name: in-cluster
+  project: projet-gn93k7
+  source:
+    path: apps/chart-simple
+    repoURL: https://gitlab.insee.fr/gn93k7/gitops-template-atelier-kube.git
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

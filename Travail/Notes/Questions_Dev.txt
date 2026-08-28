@@ -1,0 +1,18 @@
+Commits, Pull requests ... Il faut normaliser
+
+
+On fait plus du React-ts maintenant
+Et aussi, on fait du pnpm (il faut installer NodeJS sur Si@moi), et après ça marche
+
+On a push le truc en React dans le Gitlab, donc ça passe
+
+
+On fait plutôt du CI-Component que du CI "simple"
+On a pris dans Kubernetes/Images/run/elastic-agent/Repository
+
+Dans le "component", le dépot désigne le dépôt GitOps
+Le chemin du fichier c'est dans "file to change"
+
+
+platform-engineering/poc/generated
+Repository : nom du dépot GitLab

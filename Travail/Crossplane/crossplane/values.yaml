@@ -1,0 +1,52 @@
+crossplane:
+
+  replicas: 1
+
+  deploymentStrategy: RollingUpdate
+
+  image:
+    repository: proxy-docker-io.insee.fr/crossplane/crossplane
+
+  provider:
+    # -- A list of Provider packages to install.
+    packages: []
+    # -- Define entries for the default managed resource activation policy. If defined, a default MRAP will contain these activations.
+    defaultActivations: [ "*" ]
+
+  configuration:
+    # -- A list of Configuration packages to install.
+    packages: []
+
+  function:
+    # -- A list of Function packages to install
+    packages: []
+
+  # -- The imagePullSecret names to add to the Crossplane ServiceAccount.
+  imagePullSecrets:
+  - name: gitlab-helm-credentials
+
+  registryCaBundleConfig:
+    # -- The ConfigMap name containing a custom CA bundle to enable fetching packages from registries with unknown or untrusted certificates.
+    name: "kubitus-ca-bundle"
+    # -- The ConfigMap key containing a custom CA bundle to enable fetching packages from registries with unknown or untrusted certificates.
+    key: "root-certs.pem"
+
+  service:
+    # -- Configure annotations on the service object. Only enabled when webhooks.enabled = true
+    customAnnotations: {}
+
+  secrets:
+    # -- Add custom annotations to Crossplane Secret resources.
+    customAnnotations: {}
+
+  resourcesCrossplane:
+    limits:
+      # -- CPU resource limits for the Crossplane pod.
+      cpu: 500m
+      # -- Memory resource limits for the Crossplane pod.
+      memory: 1024Mi
+    requests:
+      # -- CPU resource requests for the Crossplane pod.
+      cpu: 100m
+      # -- Memory resource requests for the Crossplane pod.
+      memory: 256Mi

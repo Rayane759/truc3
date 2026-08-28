@@ -1,0 +1,48 @@
+---
+# https://pandoc.org/MANUAL.html#general-options-1
+verbosity: INFO
+to: latex
+filters:
+- pandoc-include
+- pandoc-latex-environment
+- emoji.lua
+template: eisvogel
+pdf-engine: lualatex
+listings: true
+# https://pandoc.org/MANUAL.html#variables-for-latex
+variables:
+  titlepage: true
+  fontsize: 12pt
+  geometry: margin=2cm
+  papersize: a4
+  lang: fr
+  colorlinks: true
+  table-use-row-colors: true
+  toc-own-page: true
+  numbersections: true
+  secnumdepth: 4
+  toc: true
+  toc-depth: 4
+  header-includes: |
+    \newcounter{decnb}
+    \setcounter{decnb}{1}
+    \newcounter{evonb}
+    \setcounter{evonb}{1}
+    \usepackage{tcolorbox}
+    \newtcolorbox{decision-box}{colback=cyan!5!white,arc=0pt,outer arc=0pt,colframe=cyan!60!black,fonttitle=\bfseries,title=Décision \thedecnb \stepcounter{decnb}}
+    \newtcolorbox{evolution-box}{colback=yellow!5!white,arc=0pt,outer arc=0pt,colframe=yellow!60!black,fonttitle=\bfseries,title=Evolution \theevonb \stepcounter{evonb}}
+    \newtcolorbox{info-box}{colback=green!20!white,arc=0pt,outer arc=0pt,colframe=green!60!black,fonttitle=\itshape,title=Information}
+    \newtcolorbox{warning-box}{colback=orange!5!white,arc=0pt,outer arc=0pt,colframe=orange!80!black,title=Warning}
+    \newtcolorbox{error-box}{colback=red!5!white,arc=0pt,outer arc=0pt,colframe=red!75!black}
+    \usepackage{float}
+    \floatplacement{figure}{H}
+    \usepackage{sectsty}
+    \sectionfont{\clearpage}
+    \usepackage{emoji}
+    \setemojifont{NotoColorEmoji}
+    \makeatletter
+    \renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+      {-3.25ex\@plus -1ex \@minus -.2ex}%
+      {1.5ex \@plus .2ex}%
+      {\normalfont\normalsize\underline}}
+    \makeatother

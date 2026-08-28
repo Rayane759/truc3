@@ -1,0 +1,68 @@
+Formation SSI
+
+On est souvent attaqués, presque tout le temps (par des attaques DDoS et tout notamment)
+
+On a aussi eu très récemment beaucoup d'attaques persistentes (attaques qui sont juste des points d'entrée, qui sont utilisées des mois plus tard)
+
+Est-ce qu'on serait au courant en cas d'attaques APT ? Pas sûr
+
+Il faut pas se faire confiance en interne. Sans les considérer comme malveillant, mais on part du principe que tout le monde pourrait le devenir un jour.
+C'est aussi le cas pour les prestataires.
+
+Noix de Coco -> Oignon
+
+Conseiller à la Sécurité Numérique : Olivier Levefre
+RSSI : Mélanie Martin
+
+
+Le réseau, c'est comme les routes : Il en faut (c'est obligé), mais chaque route peut être utilisée par un fou de l'autoroute (Internet). Il faut donc les sécuriser (même si cette couche est forcément fragile).
+Ainsi, on peut couper les routes inutiles, diminuer l'exposition, diminuer les possibilités de rebond (attaque qui passe d'un système à l'autre)
+
+On essaie de minimiser les flux "entrants" (de l'extérieur vers l'intérieur). Mais en pratique c'est chaud à le faire.
+Donc on accepte ce risque (plutôt, c'est l'Autorité d'Homologation qui accepte ce risque)
+
+
+Authentification : La Porte
+Ce que je connais, Ce que je suis, Ce que j'ai
+Un point important est la révocation des habilitations (c'est pour ça qu'on a pas de biométrie à l'INSEE)
+Un mot de passe identifie : Un Humain, ou un Service.
+Exceptionnellement, on peut avoir un compte générique (mais c'est vraiment rare à l'INSEE)
+
+
+MCS : Solidité des murs
+On peut anticiper les montées de version majeures
+
+
+Disponibilité : 
+Si au bout de 15 minutes, le DG est dans la boucle : Il y a besoin de dispo
+Si après 6 mois, personne dit rien : En vrai ça va
+Pour la cible, 3 solutions : 
+	- Accepter de pas répondre au besoin et communiquer sur le fait qu'il faut une solution en plus
+	- Accepter de pas répondre au besoin temporairement mais prévoir des travaux pour y parvenir
+	- Accepter de pas répondre au besoin mais accepter le risque
+	
+Confidentialité :
+C'est une échelle de confidentialité (Pas du binaire)
+
+Intégrité :
+FireBase (faut voir ce que c'est)
+
+Traçabilité :
+Découle souvent de la Confidentialité
+Il y a une PES qui dit qu'il faut savoir Qui a fait Quoi Quand ?
+
+
+SOC : Vidéosurveillance de l'appartement
+Récupère les logs (en fait, je crois que c'est le SIEM qui les récupère, et qui donne des infos au SOC)
+Même s'il y a les logs, le SOC et tout, il faut quand même faire remonter les problèmes que l'on rencontre (justement, les Faux Positifs doivent être traîtés comme des Vrais Positifs, pour pas les rater justement)
+Pour remonter l'info : Si@Moi (en priorité si ça marche), Boîte fonctionnelle (avec un objet de mail clair et tout), Tchap
+On dit ça à qui ? :
+	- DSMR / SOC (quand on travaille, sinon le SOC en dehors des heures de travail sur leur tel d'astreinte)
+	- Son GiiR sinon
+Il faut aussi respecter la Procédure de Gestion des Incidents
+
+Souvent, c'est chaud de dire si c'est un problème de prod ou de sécu, mais c'est pas grave. Mieux vaut remonter ce qu'on voit (on peut traiter le problème nous-mêmes sans en parler, mais bon autant en parler)
+
+
+Homologation
+Il y en a besoin pour passer en prod normalement

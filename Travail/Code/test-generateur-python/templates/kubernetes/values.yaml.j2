@@ -1,0 +1,50 @@
+appName: {{ appName }}
+namespace: {{ namespace }}
+
+image:
+  repository: {{ imageRepository }}
+  tag: {{ imageTag }}
+
+workloadType: {{ workloadType }}
+replicaCount: {{ replicaCount }}
+
+resources:
+  requests:
+    cpu: "{{ resources.cpuReq }}"
+    memory: "{{ resources.memReq }}"
+  limits:
+    cpu: "{{ resources.cpuLim }}"
+    memory: "{{ resources.memLim }}"
+
+service:
+  port: {{ servicePort }}
+
+exposure:
+  profile: {{ exposureProfile }}
+  {% if exposureProfile == "external" %}
+  publicHost: {{ publicHost }}
+  {% endif %}
+
+healthProbes:
+  enabled: {{ enableHealthProbes | lower }}
+  {% if enableHealthProbes %}
+  livenessPath: {{ healthPath }}/liveness
+  readinessPath: {{ healthPath }}/readiness
+  {% endif %}
+
+autoscaling:
+  enabled: {{ enableAutoscaling | lower }}
+  {% if enableAutoscaling %}
+  minReplicas: {{ replicaCount }}
+  maxReplicas: 10
+  cpuThreshold: 80
+  {% endif %}
+
+configEnv:
+{% if configEnv %}
+{% for k, v in configEnv.items() %}
+  {{ k }}: "{{ v }}"
+{% endfor %}
+{% else %}
+  {}
+{% endif %}

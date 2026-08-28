@@ -1,0 +1,1 @@
+pourquoi on dissocie dépot gitops et dépôts de code

@@ -1,0 +1,32 @@
+Notes réunion 20/03/2026 : Platform Engineering
+
+Pour l'IDDA : Beaucoup d'outils (Rainett, RunDeck, Majiba, Gitlab, ...)
+De même pour l'équipe "Kube Platform" (voir roue sur la diapo, page 9)
+
+Des objectifs et des contraintes différentes entre Dev et Ops
+
+En tant que dev, beaucoup d'étapes / lignes de code ... avant de commencer à vraiment coder notre appli
+
+Platform Engineering : Pas que sur Kube. (Il y a Puppet ? Poupett ?)
+
+Des golden Path ont déjà été faits à Lille ?
+
+
+Eglantine Granier : UX Designer, va assister Donatien pour recueillir les besoins des users
+
+Le Golden Path doit être le plus rentable possible (être le plus utilisé possible)
+
+
+En septembre, 2 changements
+	- Rapprochement Kube et VM dans une seule équipe : ...
+	Donc l'équipe Kube ne travaillera que sur KubeSocle
+
+	- Nouveau PO pour l'activité IDDA 
+	
+	
+https://www.linkedin.com/checkpoint/challengesV2/AQG_qvk0d3sVHAAAAZ0KpgH-Z77OpyTLx3ecF6wi5Spf8t5v_HSvrsR4YxXBAuNxwz_A5KLTIM5ub9ZsQXjncTgdzTcqHcTWVQ?ut=2P777FLa3d9Ic1
+https://architectelevator.com/book/platformstrategy/
+
+
+La microsegmentation est une technique permettant de diviser un réseau en segments distincts au niveau de la couche 
+applicative afin d'accroître la sécurité et de réduire l'impact d'une violation.

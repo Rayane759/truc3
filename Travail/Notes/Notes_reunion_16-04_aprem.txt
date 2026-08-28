@@ -1,0 +1,15 @@
+Notes : 
+
+Lille : Profils DevOps
+
+Orléans : Dev full-stack
+
+Paris : Dev "legacy" ("full VM")
+
+
+Majiba a une mauvaise UX (un peu)
+
+Il y a Nexus pour le monde VM (???)
+
+
+Voir "constat-besoin/synthese/besoin" : The Doors (le lien à côté il y a toute la doc askip, ou beaucoup au moins)

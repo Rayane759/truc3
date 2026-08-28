@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: $${{ values.workloadType }}
+metadata:
+  name: ${{ values.appName }}
+  namespace: ${{ values.namespace }}
+spec:
+  replicas: ${{ values.replicaCount }}
+  selector:
+    matchLabels:
+      app: ${{ values.appName }}
+  template:
+    metadata:
+      labels:
+        app: ${{ values.appName }}
+    spec:
+      containers:
+        - name: ${{ values.appName }}
+          image: "${{ values.image.repository }}:${{ values.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: ${{ values.service.port }}
+
+          resources:
+            requests:
+              cpu: ${{ values.resources.requests.cpu }}
+              memory: ${{ values.resources.requests.memory }}
+            limits:
+              cpu: ${{ values.resources.limits.cpu }}
+              memory: ${{ values.resources.limits.memory }}
+
+          {% if values.enableHealthProbes %}
+          livenessProbe:
+            httpGet:
+              path: ${{ values.healthProbes.livenessPath }}
+              port: ${{ values.service.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: ${{ values.healthProbes.readinessPath }}
+              port: ${{ values.service.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          {% endif %}
+
+          {% if values.configEnv | length > 0 %}
+          envFrom:
+            - configMapRef:
+                name: ${{ values.appName }}-config
+          {% endif %}

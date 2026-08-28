@@ -1,0 +1,122 @@
+LIEN_CONVENTIONS_NOMMAGE : https://kubernetes.gitlab-pages.insee.fr/kubeapp/documentation/guide_utilisateurs/service_espace_projet_dedie/
+
+LIEN_DOC_GITLAB_CREATION_DEPOT : https://git-scm.com/book/fr/v2/Git-sur-le-serveur-GitLab
+
+EXEMPLE_EDITORCONFIG : https://editorconfig.org/ ;
+	https://github.com/spring-projects/spring-boot/blob/main/.editorconfig (Java - Spring)
+
+EXEMPLE_GITIGNORE : https://github.com/github/gitignore/blob/main/Java.gitignore (Java)
+
+LIEN_CONVENTIONS_COMMIT : https://www.conventionalcommits.org/en/v1.0.0/
+
+EXEMPLE_GITMESSAGE : https://cbea.ms/git-commit/ ;
+	https://gist.github.com/lisawolderiksen/a7b99d94c92c6671181611be1641c733 ;
+	https://thoughtbot.com/blog/better-commit-messages-with-a-gitmessage-template (à explorer)
+
+LIEN_VERSION_SPRINGBOOT_STANDARD : https://spring.io/projects/spring-boot
+
+LIEN_DOC_CHOIX_DEPENDANCES : https://spring.io/guides/gs/spring-boot/ (Pas ouf)
+
+EXEMPLE_APPLICATION_YML_POSTGRES : https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#data.sql.datasource (Mettre un fichier exemple dès que possible)
+
+EXEMPLE_ACTUATOR_CONFIG : https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html (Pas du tout)
+
+LIEN_DOC_KUBE_HEALTHCHECKS : https://kubernetes.gitlab-pages.insee.fr/kubeapp/documentation/guide_utilisateurs/service_supervision_observabilite/
+
+EXEMPLE_LOGxxx : 
+
+LIEN_DOC_OBSERVABILITE_LOGS : https://kubernetes.gitlab-pages.insee.fr/kubeapp/documentation/guide_utilisateurs/service_supervision_observabilite/
+
+LIEN_CONVENTIONS_REACT : https://react.dev/learn (Rien à voir. Un fichier serait probablement mieux ?)
+
+EXEMPLE_DOCKERFILE_REACT : https://www.docker.com/blog/how-to-dockerize-react-app/
+
+EXEMPLE_DOCKERFILE_JAVA : ##https://spring.io/guides/topicals/spring-boot-docker/## 
+	https://docs.docker.com/get-started/docker-concepts/building-images/multi-stage-builds/ (Bien)
+
+LIEN_IMAGES_BASE_VALIDEES :
+
+LIEN_DOC_GITLAB_REGISTRY : https://docs.gitlab.com/ee/user/packages/container_registry/
+
+LIEN_DEMANDE_ACCES_REGISTRY : 
+
+EXEMPLE_GITLAB_CI_JAVA : https://docs.gitlab.com/ee/ci/examples/ ;
+	https://gitlab.com/gitlab-examples/maven/simple-maven-example (Maven) ;
+	https://gitlab.com/gitlab-org/project-templates/spring/-/blob/main/.gitlab-ci.yml?ref_type=heads (mieux)
+
+EXEMPLE_GITLAB_CI_JAVA_REACT : https://docs.gitlab.com/ee/ci/examples/ (Il y a pas React en fait)
+
+LIEN_DOC_CI_TEMPLATES : https://docs.gitlab.com/ee/ci/yaml/includes.html (Pas du tout des templates. Cette doc en particulier explique le fonctionnement des "include" ...)
+
+LIEN_PROBLEME_CI : https://docs.gitlab.com/ee/ci/debugging/
+
+LIEN_DOC_VAULT_CREATION_SECRET : https://gitlab.insee.fr/iahs/secrets/documentation/doc-publique
+
+LIEN_CONVENTIONS_VAULT : https://gitlab.insee.fr/iahs/secrets/documentation/doc-publique (?????????????)
+
+EXEMPLE_SPRING_CLOUD_VAULT_CONFIG : https://cloud.spring.io/spring-cloud-vault/reference/html/
+
+LIEN_DOC_VAULT_SPRING : https://spring.io/projects/spring-vault
+
+LIEN_DOC_GITLEAKS : https://github.com/gitleaks/gitleaks ; 
+	https://blog.stephane-robert.info/docs/securiser/analyser-code/gitleaks/#gitlab-ci (Mieux pour directement appliquer)
+
+EXEMPLE_HELM_CHART_JAVA : https://kubernetes.gitlab-pages.insee.fr/kubeapp/documentation/guide_utilisateurs/helm/premier_pas_helm/ ; 
+	https://kubernetes.gitlab-pages.insee.fr/kubeapp/documentation/guide_utilisateurs/helm/chart_generique/ ; 
+	https://helm.sh/docs/chart_template_guide/getting_started/
+
+EXEMPLE_HELM_CHART_FULL : https://kubernetes.gitlab-pages.insee.fr/kubeapp/documentation/guide_utilisateurs/helm/premier_pas_helm/ ;
+	https://kubernetes.gitlab-pages.insee.fr/kubeapp/documentation/guide_utilisateurs/helm/chart_generique/ ;
+	https://helm.sh/docs/topics/charts/
+
+EXEMPLE_MR_ONBOARDING : 
+
+LIEN_EQUIPE_PLATFORM : 
+
+LIEN_DOC_ONBOARDING_KUBE : https://onboarding.dev.kube.insee.fr/ ;
+	https://demo.insee.io/
+
+LIEN_DOC_ARGOCD : https://gitops-kubernetes.developpement.insee.fr/ ;
+	https://gitops-kubernetes.insee.fr/ ;
+	https://gitops-kubernetes.demo.insee.io/ ;
+	https://argo-cd.readthedocs.io/en/stable/
+
+EXEMPLE_README : https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes (Pas ouf)
+	(à explorer) : https://github.com/Louis3797/awesome-readme-template ;
+		https://github.com/othneildrew/Best-README-Template
+
+EXEMPLE_RUNBOOK : https://sre.google/sre-book/service-level-objectives/ ; (Rien à voir)
+	https://github.com/runbear-io/awesome-runbook/blob/main/docs/kubernetes/decoding-secrets.md (Exemple à adapter, mais bien pour la forme) ;
+	https://www.solarwinds.com/sre-best-practices/runbook-template (Pour avoir les étapes)
+
+
+
+
+Bonus : 
+
+Prometheus : https://prometheus.io/docs/introduction/overview/
+Grafana : https://grafana.com/docs/grafana/latest/ ; https://grafana.insee.fr/login
+Loki : https://grafana.com/docs/loki/latest/
+
+https://gitlab.insee.fr/kubernetes/charts/generique-insee/-/blob/main/CHANGELOG.md?ref_type=heads
+
+Images sécurisées :
+	Images DHI du Docker : https://docs.docker.com/dhi/
+	https://docs.docker.com/dhi/features/#dhi-community-features
+	https://gitlab.insee.fr/kubernetes
+	Puis Images/Run/Hardening
+Ou même sur le "gitlab-pages" du KubeApp, dans Catalogues/Images, on va dans Communautaires et Renforcées
+
+
+
+
+2.2 - 2.3 - 3.1 (Problème de droit ? Voir en dessous) - 6 (Vault) - 
+
+npm -v
+npm : Impossible de charger le fichier C:\Program Files\nodejs\npm.ps1, car l’exécution de scripts est désactivée sur ce système. 
+Pour plus d’informations, consultez about_Execution_Policies à l’adresse https://go.microsoft.com/fwlink/?LinkID=135170.
+Au caractère Ligne:1 : 1
++ npm -v
++ ~~~
+    + CategoryInfo          : Erreur de sécurité : (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess

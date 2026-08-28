@@ -1,0 +1,6 @@
+React standard
+Batch classique
+Batch multi-step
+-----> A voir avec Gaetan Varlet, et peut-être Floriane Moron
+
+Modèle d'appli qui lance des ..., récupère des logs en appelant l'API de Grafana

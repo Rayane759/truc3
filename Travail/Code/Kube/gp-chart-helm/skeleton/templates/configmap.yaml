@@ -1,0 +1,11 @@
+{% if values.configEnv | length > 0 %}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${{ values.appName }}-config
+  namespace: ${{ values.namespace }}
+data:
+  {% for item in values.configEnv %}
+  ${{ item.key }}: "${{ item.value }}"
+  {% endfor %}
+{% endif %}

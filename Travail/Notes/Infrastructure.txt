@@ -1,0 +1,221 @@
+Infrastructure
+
+
+Il y a quoi dedans ?
+
+1) Réseau
+Port exposé
+Ouvert à l'extérieur ?
+Protocole (HTTP(S))
+
+2) Sécurité
+Gestion des secrets (Mot de passe sécurisé (s'il y a un admin), ...)
+Vérification de la configuration réseau
+Observabilité de sécurité
+
+
+3) Ressources (CPU, Mémoire)
+
+
+
+4) Stockage
+Espace de stockage
+Sauvegarde (+ Configuration)
+Type de BDD 
+Bucket S3 ?
+API ?
+
+5) Configuration
+Nombre de replicas
+Image Docker
+Load Balancer
+Organisation des migrations (changement majeur)
+
+
+6) Observabilité
+Créer et stocker les logs
+Monitoring global (physique et logiciel) 
+
+
+Points de tension en archi : 
+
+	Peut-on modifier l'infrastructure ? Si oui, quoi et comment ?
+	Load Balancer (Il peut voir s'il y a les ressources disponibles ? ...)
+	Sauvegarde et Restauration
+	En cas de crash ? (Idempotence, Sauvegarde et Restauration, Maintenance automatique ?, ...)
+	
+	
+	
+	
+	
+Concrètement : 
+
+Un fichier yaml pour la configuration, et les commandes Kube qui vont bien ... à compléter avec la doc de Donatien
+
+
+
+
+
+Notes documentation :
+
+Réseau (+ Sécurité) :
+	Remplacement de Centron par ELK (??)
+	Logs F5, Logs Checkpoint, Logs Palo et Logs Cisco
+	Métriques réseau dans ELK
+	Golden Path pour les applications SpringBoot / React ?? (Resp Kube) ?????
+	Ansible et Opentofu
+	Nouvelle offre SFTP (avec la DILA)
+	Astro SFTP
+	Routage Z25
+	
+
+Système : 
+	Robot de sauvegarde pour toutes les externalisations
+	Serveur centralisé de sauvegarde Proxmox
+	Offre de service de sauvegarde S3
+	Sauvegarde export BDD sans Cohesity
+	Applishare V4
+	Ansible et Opentofu
+	Fin de Windows Server 2019 (???)
+	Volume persistant chiffré (avec Kube)
+	Transfert API
+	Gravitee
+	
+
+DPII (?) :
+	ES (pour l'observabilité, analyser l'état de santé de son service) ??
+	Keycloak, RunDeck, SEF, Applishare
+	Appels externes et inter-quartiers passent par l'API Manager (Echanges inter-applicatifs)
+	
+
+Kube : 
+	KubeProd, KubePP et KubeDMZ (Clusters de production)
+	Offre BDD dans Kube
+	Golden Path pour les applications SpringBoot / React ??
+	Offre S3 consolidée  /  Offre de stockage sécurisée pour KubeApp
+	MinIO
+	Keycloack Kube SIA
+
+
+IDDA :
+	Nexus
+	RunDeck, GitLab
+	Ansible, KubeApp
+	Applishare et S3
+	
+	
+IAHS :
+	Pegase
+	SPECOPS (Gestion et contrôle des Mots de Passe)
+	Keycloak et Vault
+	ProConnect
+
+
+PDD : 
+	PGBackRest
+	PG dans Kube (?)
+	PG2Parquet
+	Service Anonymisation
+	
+	
+AgroWorkflow ?????
+
+
+
+
+
+
+
+
+En pratique : (Première étape)
+
+On peut faire ça avec des "Library Charts" en Helm (https://helm.sh/fr/docs/topics/library_charts/)
+On peut utiliser Backstage (pour exposer le formulaire), puis le backend génère les Charts Helm grâce aux valeurs du formulaire.
+Pour l'instant, on peut se dire que les Charts Helm sont à copier (ou à télécharger si on peut ?)
+
+1) Application 
+	- Deployment
+	
+	Ce qu'on peut rajouter : 
+		- Autoscaling
+		- Jobs
+		- InitContainers
+		- StatefulSet
+	
+2) Réseau
+	- Service
+	- Ingress
+	
+	Ce qu'on peut rajouter :
+		- NetworkPolicy
+		- Certificats TLS
+	
+3) Sécurité
+	- Namespace
+	- ServiceAccount
+	- Rôle
+	- RoleBinding
+	- Secret (Vault)
+	Mais il faut voir comment on fait et ce dont on a besoin
+	
+	Ce qu'on peut rajouter : 
+		- PodSecurityPolicy
+		- SecurityContext
+		- OPA / Kyverno ???
+		- NetworkPolicy
+		- Certificats TLS
+	
+4) Configuration
+	- Ressources
+	- ConfigMap
+	- Secret
+	- Variables d'environnement
+	
+5) CI/CD
+	- Pipeline CI (Gitlab ???)
+	- Image Docker
+	
+	Ce qu'on peut ajouter : 
+		- AgroCD
+		- Kustomize overlays (Variantes d'environnement (Dev / Staging / Prod)) ?????
+		- Rollouts (Argo Rollouts) ???
+	
+6) Observabilité
+	- Health Checks (LivenessProbe / ReadinessProbe)
+	
+	Ce qu'on peut ajouter : 
+		- Grafana / Prometheus
+		- AlertManager
+		- Logs
+	
+7) Stockage 
+	- PVC / PV
+	- ConfigMap
+
+
+
+Comment ça marche en gros : 
+
+1) On se connecte à l'interface Backstage (donc on doit être connecté pour utiliser le Golden Path)
+2) On remplit le formulaire 
+3) On copie / télécharge les fichiers générés par le Backend
+4) On intègre ces fichiers au projet (où il y a notre application)
+5) On déploie (sans toucher à rien si on a de la chance ?)
+	Sinon : 
+		- On vérifie le fichier "values.yaml"
+		- On vérifie que la pipeline CI passe
+		- On vérifie que c'est bien déployé (sur AgroCD je crois)
+6) On obtient une application bien configurée
+
+Pourquoi se connecter : 
+	Je sais pas comment marchent Vault, Keycloak, etc. mais c'est peut-être plus simple si l'agent est connecté au moment du formulaire ???
+
+
+mkdocs load
+
+
+
+
+Environnement ephémère
+Observabilité clé en main
+Golden Path applicatif (plutôt qu'un environnement)

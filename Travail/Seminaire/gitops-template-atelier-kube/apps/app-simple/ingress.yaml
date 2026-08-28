@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-simple
+  annotations:
+    cert-manager.io/cluster-issuer: developpement-insee-fr
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: app-simple-gn93k7-test.developpement.insee.fr
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app-simple
+            port:
+              number: 8080
+  tls:
+  - hosts:
+    - app-simple-gn93k7-test.developpement.insee.fr
+    secretName: app-simple

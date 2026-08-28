@@ -1,0 +1,54 @@
+openapi: 3.0.3
+
+info:
+  title: Test-TBC
+  description: |
+    API REST du service **Test-TBC**.
+
+    > Ce fichier est généré par le Golden Path. Complétez-le au fur et à mesure
+    > que vous développez vos endpoints.
+  version: 1.0.0
+  contact:
+    name: team-platform
+
+servers:
+- url: /
+  description: Serveur courant
+
+tags:
+- name: health
+  description: Supervision et état du service
+
+paths:
+  /actuator/health:
+    get:
+      tags:
+      - health
+      summary: État du service
+      description: |
+        Retourne l'état de santé du service (liveness + readiness).
+        Exposé par Spring Boot Actuator.
+      operationId: getHealth
+      responses:
+        "200":
+          description: Service opérationnel
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
+          description: Service dégradé ou indisponible
+  # ---------------------------------------------------------------------------
+  # Ajoutez vos endpoints ci-dessous en suivant le modèle ci-dessus.
+  # Exemple :
+  #
+  # /api/v1/ressource:
+  #   get:
+  #     tags:
+  #       - ressource
+  #     summary: Lister les ressources
+  #     operationId: listRessources
+  #     responses:
+  #       "200":
+  #         description: Liste retournée avec succès
+  # ---------------------------------------------------------------------------

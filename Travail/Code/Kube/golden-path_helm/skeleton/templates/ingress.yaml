@@ -1,0 +1,26 @@
+{{- if eq .Values.exposure.profile "external" }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.appName }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{ .Values.exposure.publicHost }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.appName }}
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - {{ .Values.exposure.publicHost }}
+      secretName: {{ .Values.appName }}-tls
+{{- end }}

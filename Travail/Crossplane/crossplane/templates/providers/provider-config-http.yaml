@@ -1,0 +1,12 @@
+apiVersion: http.m.crossplane.io/v1alpha2
+kind: ProviderConfig
+metadata:
+  name: http-none
+spec:
+  credentials:
+    source: None
+  tls:
+    caCertSecretRef:
+      name: kubitus-ca-bundle
+      namespace: crossplane
+      key: root-certs.pem

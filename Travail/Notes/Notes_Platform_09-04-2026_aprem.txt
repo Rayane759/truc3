@@ -1,0 +1,95 @@
+Sylvain Martin et Nicolas 
+
+On va orienter nos tests vers Backstage
+
+Il faut que ce soit gratuit, ...
+
+MistralVibe (pour faire du Vibe coding), mais Ludovic aimerait bien qu'on puisse également donner des outils à tester pour l'équipe en septembre
+
+
+
+
+
+
+
+
+"""
+1. Présentation du contexte
+Explique rapidement :
+Le besoin du client (ex : choix d’un ERP, CRM, cloud, outil BI…)
+Les enjeux (performance, coût, sécurité, scalabilité, etc.)
+Le périmètre du benchmark
+👉 Exemple :
+Benchmark de solutions CRM pour optimiser la gestion commerciale et améliorer le suivi client.
+2. Objectifs du benchmark
+Définis clairement ce que tu vas évaluer :
+Comparer plusieurs solutions
+Identifier la meilleure option selon des critères précis
+Réduire les risques de choix
+3. Périmètre des solutions analysées
+Liste :
+Les solutions étudiées (si connues) ou
+Le type de solutions (ex : CRM SaaS, solutions open source…)
+👉 Exemple :
+Salesforce, HubSpot, Dynamics (ou équivalent selon le projet)
+4. Méthodologie de benchmark
+C’est une des parties les plus importantes :
+Critères d’analyse
+Fonctionnalités
+Performance
+Sécurité
+Coût (licences + TCO)
+Intégration avec l’existant
+UX / facilité d’usage
+Support & éditeur
+Méthodes utilisées
+Analyse documentaire
+Démonstrations éditeurs
+Tests techniques (POC si inclus)
+Interviews utilisateurs (optionnel)
+5. Livrables
+Très important pour cadrer la valeur :
+Rapport de benchmark détaillé
+Tableau comparatif des solutions
+Recommandations argumentées
+Scoring / grille d’évaluation
+Restitution (présentation orale)
+6. Planning / délais
+Durée de la mission
+Phases (ex : cadrage → analyse → restitution)
+👉 Exemple :
+Semaine 1 : cadrage
+Semaine 2–3 : analyse
+Semaine 4 : restitution
+7. Équipe / expertise
+Qui intervient
+Compétences clés (architecture, cloud, data, etc.)
+8. Tarification
+Détaille clairement :
+Prix global ou TJM × nombre de jours
+Ce qui est inclus / non inclus
+Options (ex : POC, ateliers supplémentaires)
+9. Hypothèses et limites
+Très utile pour éviter les malentendus :
+Accès aux outils fourni par le client
+Disponibilité des interlocuteurs
+Pas de développement inclus (sauf mention contraire)
+10. Conditions générales
+Modalités de paiement
+Validité du devis
+Confidentialité
+Bonus (fortement recommandé)
+Ajoute une partie :
+👉 Critères de succès du benchmark
+Permet de montrer que tu es orienté résultat
+Exemple de structure simple
+Contexte & objectifs
+Périmètre
+Méthodologie
+Livrables
+Planning
+Équipe
+Tarifs
+Hypothèses
+Conditions
+"""

@@ -1,0 +1,180 @@
+site_name: Platform Engineering
+site_url: https://platform-engineering.gitlab-pages.insee.fr/documentation/
+
+# Requis pour afficher les boutons "Modifier cette page" / "Voir le code source"
+# (features content.action.edit / content.action.view). Sans repo_url,
+# page.edit_url est vide et les deux boutons ne s'affichent pas.
+repo_url: https://gitlab.insee.fr/platform-engineering/documentation
+repo_name: platform-engineering/documentation
+# edit_uri est relatif à repo_url. Le mkdocs.yaml est dans website/, les
+# sources sont donc dans website/docs/ à la racine du dépôt.
+edit_uri: -/edit/main/website/docs/
+
+nav:
+  - Introduction: introduction/index.md
+  - Etat des lieux:
+      - Contexte:
+          - contexte/index.md
+      - Panorama:
+          - Organisation des équipes: contexte/panorama/orga-equipes.md
+          - Acteurs à disposition des développeurs: contexte/panorama/equipes.md
+          - Outils et technologies en place au seins du DPII: contexte/panorama/outils.md
+          - Outils de la stack par couches fonctionnelles: contexte/panorama/outils-fonctionnels.md
+          - Rôles et responsabilités autour de l’infrastructure et du delivery: contexte/panorama/responsabilite.md
+  - Recueil des besoins:
+      - Résumé:
+          - constat-terrain/index.md
+      - Protocole:
+          - Proto Personnas: constat-terrain/protocole/proto_personnas.md
+          - Protocole: constat-terrain/protocole/protocole.md
+          - Scenario:
+              - dev: constat-terrain/protocole/interviews/devs/devs.md
+              - archis: constat-terrain/protocole/interviews/archis/archi.md
+              - secu: constat-terrain/protocole/interviews/secu/secu.md
+      - Synthèse:
+          - Irritants: constat-terrain/synthese/irritiants-&-points-frictions.md
+          - Besoins: constat-terrain/synthese/besoins.md
+          - Impacts: constat-terrain/synthese/impacts.md
+          - Personnas: constat-terrain/synthese/personnas.md
+          - Cas d'utilisation: constat-terrain/synthese/cas_utilisation.md
+      - Annexe:
+          - Sondage DevExp: constat-terrain/annexes/annexe-1-analyse-devexp.md
+          - Analyse des demandes les plus courantes: constat-terrain/annexes/annexe-2-analyse-courante.md
+          - Dépendances entre équipes: constat-terrain/annexes/annexe-4-dependance-equipe.md
+          - Focus Groupe:
+              - SNDIL: constat-terrain/annexes/annexe-3A-focus-groupe-sndil.md
+              - SNDIN: constat-terrain/annexes/annexe-3B-focus-groupe-sndin.md
+              - SNDIP: constat-terrain/annexes/annexe-3C-focus-groupe-sndip.md
+              - SNDIO: constat-terrain/annexes/annexe-3D-focus-groupe-sndio.md
+          - Interviews:
+              - interviews_1: constat-terrain/annexes/annexe-5A-interview1.md
+              - interviews_2: constat-terrain/annexes/annexe-5B-interview2.md
+              - interviews_3: constat-terrain/annexes/annexe-5C-interview3.md
+              - interviews_4: constat-terrain/annexes/annexe-5D-interview4.md
+              - interviews_5: constat-terrain/annexes/annexe-5E-interview5.md
+              - interviews_6: constat-terrain/annexes/annexe-5F-interview6.md
+              - interviews_7: constat-terrain/annexes/annexe-5G-interview7.md
+              - interviews_8: constat-terrain/annexes/annexe-5H-interview8.md
+
+  - PlatformEngineering:
+      - C'est quoi ?: pfe/index.md
+      - Offre de service: pfe/offre_service.md
+      - Modèle opérationnel: pfe/organisation.md
+      - Product Vision Board: pfe/product_board.md
+      - Etudes et POCs:
+          - pfe/pocs/index.md
+          - Components - To Be Continous: pfe/pocs/to-be-continous.md
+          - Crossplane: pfe/pocs/crossplane.md
+          - Kratix: pfe/pocs/kratix.md
+          - Observabilité (piste à explorer): pfe/pocs/observabilite.md
+      - Proposition:
+          - pfe/adr/index.md
+          - ADR-001 - Périmètre fonctionnel de l'offre de service Platform Engineering: pfe/adr/adr-001-perimetre-fonctionnel.md
+          - ADR-002 - Architecture fonctionnelle DevExperience: pfe/adr/adr-002-architecture-fonctionnelle.md
+          - ADR-003 - Modèle d'insertion de la plateforme dans le SI: pfe/adr/adr-003-insertion-equipe.md
+          - ADR-004 - Relation équipe DevExpérience vis-à-vis des équipes capabilities: pfe/adr/adr-004-relation.md
+          - ADR-005 - Composition et organisation de l'équipe DevExperience: pfe/adr/adr-005-organisation-equipe.md
+          - ADR-006 - Modèle de support: pfe/adr/adr-006-modele-support.md
+          - ADR-007 — Architecture applicative DevExperience: pfe/adr/adr-007-architecture-applicative.md
+          - ADR-008 — Format de la plateforme: pfe/adr/adr-008-format-plateforme.md
+          - ADR-009 — Choix de Backstage comme IDP: pfe/adr/adr-009-choix-idp.md
+          - ADR-010 — Stratégie de priorisation: pfe/adr/adr-010-priorisation-doc.md
+          - ADR-011 — Approche de mise en œuvre: pfe/adr/adr-011-approche-de-mise-en-œuvre.md
+          - ADR-012 — Indicateurs de succès et gouvernance produit: pfe/adr/adr-012-indicateurs-gouvernance.md
+          - ADR-013 — Gestion des risques: pfe/adr/adr-013-risques.md
+          - ADR-014 — Répartition de la relation utilisateur entre le PO DevEx et les POs capability: pfe/adr/adr-014-relation-po.md
+          - Annexe 1 — Modèle d'interaction dev / Platform / Capability Teams: pfe/adr/annexe1/annexe-1-interaction-dev-platform.md
+          - Annexe 1 — Organisation cible de la plateforme: pfe/adr/annexe1/annexe-1-organisation-plateforme.md
+  - Roadmap: roadmap/index.md
+  - Autres:
+      - Comitologie:
+          - autres/comitologie/reunion_lancement.md
+      - Présentations:
+          - autres/presentations/index.md
+      - Animation:
+          - PlatformEngineering Games: ./autres/focusgroupe/index.md
+  - Archives:
+      - Golden Path (Stage):
+          - Qu'est ce qu'un Golden Path ?:
+              - golden_path/definition/index.md
+          - Organisation:
+              - golden_path/schema/index.md
+          - Comment construire un bon Golden Path ?:
+              - golden_path/comment_faire/index.md
+          - De quoi est constitué un Golden Path ?:
+              - golden_path/composants/index.md
+          - Concrètement:
+              - golden_path/concret/index.md
+          - POC:
+              - golden_path/poc/index.md
+
+plugins:
+  - search
+  - awesome-pages
+  - git-revision-date-localized
+  - glightbox
+
+theme:
+  name: material
+  language: fr
+  # Chemins RELATIFS à docs/ (pas de "/" initial, sinon l'URL devient absolue
+  # et ignore le préfixe /documentation/ de GitLab Pages -> 404).
+  favicon: assets/svg/logo.svg
+  logo: assets/svg/logo.svg
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+      primary: light-blue
+      accent: blue
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+      primary: indigo
+      accent: blue
+  custom_dir: overrides
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - announce.dismiss
+    - navigation.sections
+    - navigation.path
+    - navigation.top
+    # Recherche
+    - search.suggest
+    - search.highlight
+    # Accès rapide pour le modification du code
+    - content.action.edit
+    - content.action.view
+  icon:
+    #repo: material/gitlab # icon for git button
+    edit: material/file-edit-outline
+    view: material/file-eye-outline
+markdown_extensions:
+  - md_in_html
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tabbed:
+      alternate_style: true
+extra_css:
+  - assets/css/extra.css

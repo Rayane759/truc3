@@ -1,0 +1,6 @@
+apiVersion: v2
+name: crossplane
+description: Configuration Crossplane (providers, XRDs, Compositions) pour la plateforme interne
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

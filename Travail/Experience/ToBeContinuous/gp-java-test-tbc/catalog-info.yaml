@@ -1,0 +1,44 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: testtobecontinuous
+  title: Test-TBC
+  description: |
+    Test-TBC - Service Java Spring Boot généré par le Golden Path.
+  tags:
+  - java
+  - spring-boot
+  - rest-api
+  annotations:
+    # GitLab
+    gitlab.com/project-slug: platform-engineering/poc/generated/gp-java-test-tbc
+    # GitLab CI
+    gitlab.com/ci-pipeline: platform-engineering/poc/generated/gp-java-test-tbc
+    gitlab.com/instance: gitlab.insee.fr
+    # links:
+    # - url: https://testtobecontinuous.domaine.insee.fr/swagger-ui.html
+    #   title: Swagger UI
+    #   icon: api
+spec:
+  type: service
+  lifecycle: experimental
+  owner: team-platform
+  providesApis:
+  - testtobecontinuous-v1
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: testtobecontinuous-v1
+  title: Test-TBC v1
+  description: API REST - Test-TBC.
+  tags:
+  - rest
+  - openapi
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: team-platform
+  system: testtobecontinuous # Marche pas ?
+  definition:
+    $text: ./src/main/resources/openapi/api.yaml

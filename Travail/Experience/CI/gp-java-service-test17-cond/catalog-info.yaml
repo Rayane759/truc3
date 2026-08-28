@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: my-service-java-test17-cond
+  title: gp-java-service-test17-cond
+  # description: 
+  tags:
+  - java
+  - spring-boot
+
+spec:
+  type: service
+  owner: team-platform
+  lifecycle: experimental
+  profile:
+    displayName: gp-java-service-test17-cond

@@ -1,0 +1,15 @@
+helmProvider:
+  package: xpkg.crossplane.io/crossplane-contrib/provider-helm:v1.2.0
+  serviceAccount: provider-helm
+  saNamespace: crossplane-system
+
+xrd:
+  group: platform.example.org
+  kind: XHelmApp
+  plural: xhelmapps
+
+chart:
+  # À remplacer par votre chart interne une fois packagé/publié
+  name: nginx
+  repository: https://charts.bitnami.com/bitnami
+  version: "18.2.5"

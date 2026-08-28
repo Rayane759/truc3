@@ -1,0 +1,14 @@
+output "vm_name" {
+  description = "Nom de la VM provisionnée"
+  value       = vsphere_virtual_machine.app.name
+}
+
+output "vm_ip" {
+  description = "Adresse IP de la VM"
+  value       = vsphere_virtual_machine.app.default_ip_address
+}
+
+output "ansible_inventory_hint" {
+  description = "Commande Ansible à lancer après provisioning"
+  value       = "ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -e vm_ip=${vsphere_virtual_machine.app.default_ip_address}"
+}

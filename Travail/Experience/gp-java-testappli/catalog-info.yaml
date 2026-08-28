@@ -1,0 +1,44 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: applitestlocal
+  title: Test-applijava
+  description: |
+    Test-applijava - Service Java Spring Boot généré par le Golden Path.
+  tags:
+  - java
+  - spring-boot
+  - rest-api
+  annotations:
+    # GitLab
+    gitlab.com/project-slug: platform-engineering/poc/generated/gp-java-testappli
+    # GitLab CI
+    gitlab.com/ci-pipeline: platform-engineering/poc/generated/gp-java-testappli
+    gitlab.com/instance: gitlab.insee.fr
+    # links:
+    # - url: https://applitestlocal.domaine.insee.fr/swagger-ui.html
+    #   title: Swagger UI
+    #   icon: api
+spec:
+  type: service
+  lifecycle: experimental
+  owner: team-platform
+  providesApis:
+  - applitestlocal-v1
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: applitestlocal-v1
+  title: Test-applijava v1
+  description: API REST - Test-applijava.
+  tags:
+  - rest
+  - openapi
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: team-platform
+  system: applitestlocal # Marche pas ?
+  definition:
+    $text: ./src/main/resources/openapi/api.yaml

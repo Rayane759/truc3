@@ -1,0 +1,56 @@
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+  tags = { Name = "${local.prefix}-vpc" }
+}
+
+resource "aws_subnet" "public" {
+  count             = 2
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.${count.index}.0/24"
+  availability_zone = "${var.region}${count.index == 0 ? "a" : "b"}"
+  map_public_ip_on_launch = true
+  tags = { Name = "${local.prefix}-public-${count.index}" }
+}
+
+{% if enableDatabase %}
+resource "aws_subnet" "private" {
+  count             = 2
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.${count.index + 10}.0/24"
+  availability_zone = "${var.region}${count.index == 0 ? "a" : "b"}"
+  tags = { Name = "${local.prefix}-private-${count.index}" }
+}
+{% endif %}
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+  tags   = { Name = "${local.prefix}-igw" }
+}
+
+resource "aws_security_group" "app" {
+  name   = "${local.prefix}-app-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = var.app_port
+    to_port     = var.app_port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  {% if enableHttps %}
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  {% endif %}
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}

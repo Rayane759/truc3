@@ -1,0 +1,59 @@
+stages:
+  - build 🔨
+  - lint
+  - build docker
+  - check
+  - push
+
+include:
+  - component: gitlab.insee.fr/kubernetes/kubeapp/components/docker/gitlab-ci-docker-lint-component@0.0.2
+    inputs:
+      path_to_dockerfile: "Dockerfile"
+      stage: lint
+  - component: gitlab.insee.fr/kubernetes/kubeapp/components/docker/gitlab-ci-docker-build-component@0.0.2
+    inputs:
+      path_to_dockerfile: "Dockerfile"  # Optionnel
+      stage: build docker
+  - component: gitlab.insee.fr/kubernetes/kubeapp/components/docker/gitlab-ci-docker-check-component@0.0.2
+    inputs:
+      trivy_path_to_trivyignore: "" # Optionnel
+      allow_failure: true
+      stage: check
+  - component: gitlab.insee.fr/kubernetes/kubeapp/components/docker/gitlab-ci-docker-push-component@0.0.2
+    inputs:
+      push_image_registry: "${CI_REGISTRY_IMAGE}"
+      push_image_tags: "${CI_COMMIT_REF_NAME}"
+      tar_path: "image.tar"
+      stage: push
+
+variables:
+  HTTP_PROXY: http://proxy-app.insee.fr:3128
+  http_proxy: http://proxy-app.insee.fr:3128
+  HTTPS_PROXY: http://proxy-app.insee.fr:3128
+  https_proxy: http://proxy-app.insee.fr:3128
+  NO_PROXY: ".insee.fr,.insee.eu,.insee.intra,localhost,insee.test"
+  no_proxy: ".insee.fr,.insee.eu,.insee.intra,localhost,insee.test"
+
+build-app:
+  stage: build 🔨
+  image: gitlab-registry.insee.fr/kubernetes/images/build/maven-jdk-toolbox:21
+  tags:
+    - docker
+  script:
+    - "mvn -V package"
+  artifacts:
+    paths:
+      - ./target/*.jar
+    expire_in: 1 day
+
+docker-build:
+  dependencies:
+    - build-app
+
+docker-check:
+  dependencies: 
+    - docker-build
+
+docker-publish:
+  dependencies: 
+    - docker-build

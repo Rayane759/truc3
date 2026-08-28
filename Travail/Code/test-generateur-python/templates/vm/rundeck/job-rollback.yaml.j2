@@ -1,0 +1,45 @@
+- defaultTab: nodes
+  description: |
+    Rollback de {{ appName }} vers une version précédente.
+    Retélécharge l'artefact depuis Nexus et redémarre le service.
+  executionEnabled: true
+  group: "{{ teamName }}/{{ appName }}"
+  id: rollback-{{ appName }}-{{ environnement }}
+  loglevel: INFO
+  name: "Rollback {{ appName }} ({{ environnement }})"
+
+  options:
+    - name: rollback_version
+      label: "Version cible (rollback)"
+      description: "Version vers laquelle revenir (ex: 1.1.0)"
+      required: true
+      regex: '^[0-9]+\.[0-9]+\.[0-9]+$'
+
+  sequence:
+    keepgoing: false
+    strategy: node-first
+    commands:
+
+      - description: "Arrêter le service"
+        exec: "ansible -i ansible/inventory.ini app -b -m systemd -a 'name={{ appName }} state=stopped'"
+
+      - description: "Redéployer la version cible"
+        exec: >
+          ansible-playbook
+          -i ansible/inventory.ini
+          ansible/playbook.yml
+          -e "artifact_version=${RD_OPTION_ROLLBACK_VERSION}"
+
+      - description: "Vérifier la santé après rollback"
+        exec: >
+          curl -sf "http://{{ '${VM_IP}' }}:{{ appPort }}/actuator/health" | grep -q '"status":"UP"'
+
+  notification:
+    onfailure:
+      email:
+        recipients: "{{ teamName }}@example.fr"
+        subject: "[ÉCHEC] Rollback {{ appName }} {{ environnement }} — ${RD_OPTION_ROLLBACK_VERSION}"
+    onsuccess:
+      email:
+        recipients: "{{ teamName }}@example.fr"
+        subject: "[OK] Rollback {{ appName }} {{ environnement }} vers ${RD_OPTION_ROLLBACK_VERSION}"

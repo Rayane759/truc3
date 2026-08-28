@@ -1,0 +1,115 @@
+stages:
+  - build
+  - deploy
+
+### templates Rules ######################################################################################
+
+.template:build_rules:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+      when: never
+    - if: $CI_COMMIT_BEFORE_SHA == '0000000000000000000000000000000000000000'
+      changes:
+        compare_to: main
+        paths:
+          - ".build/*.{ttf,yaml}"
+          - "${PATH_TO_MD}/*.{md,png}"
+          - "${PATH_TO_MD}/**/*.{md,png}"
+    - if: $CI_COMMIT_BEFORE_SHA != '0000000000000000000000000000000000000000'
+      changes:
+        - ".build/*.{ttf,yaml}"
+        - "${PATH_TO_MD}/*.{md,png}"
+        - "${PATH_TO_MD}/**/*.{md,png}"
+
+.template:deploy_rules:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # Run this job when commits are merged or pushed to the default branch
+      changes:
+        - "${PATH_TO_MD}/*.{md,png}"
+        - "${PATH_TO_MD}/**/*.{md,png}"
+
+### templates Jobs ############################################################################
+
+.template:pdf_generation:
+  image: melobenja/pandoc-extra-emoji #https://github.com/benjb59/pandoc-extra-emoji
+  before_script:
+    - mkdir -p ~/.fonts
+    - cp .build/*.ttf ~/.fonts/
+    - fc-cache -f
+    - cp .build/*.lua "${PATH_TO_MD}/"
+    - cp .build/pandoc-defaults.yaml ~/defaults.yaml
+    - sed -i "s#__VERSION__#${VERSION}.${CI_PIPELINE_IID}#" "${PATH_TO_MD}/README.md" || true
+    - sed -i "s#__DATE__#$(date +%d/%m/%Y)#" "${PATH_TO_MD}/README.md" || true
+  script:
+    - cd "${PATH_TO_MD}"
+    - pandoc --defaults ~/defaults.yaml --from markdown+emoji -o "${PDF_NAME}_${VERSION}.${CI_PIPELINE_IID}.pdf" README.md
+  artifacts:
+    paths:
+      - "${PATH_TO_MD}/${PDF_NAME}_${VERSION}.${CI_PIPELINE_IID}.pdf"
+
+# https://docs.gitlab.com/ee/user/packages/generic_packages/#publish-a-generic-package-by-using-cicd
+.template:pdf_publish:
+  image: curlimages/curl:latest
+  script:
+    - echo "running release_job for ${PATH_TO_MD}_${VERSION}.${CI_PIPELINE_IID}"
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "${PATH_TO_MD}/${PDF_NAME}_${VERSION}.${CI_PIPELINE_IID}.pdf" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PATH_TO_MD}/${VERSION}.${CI_PIPELINE_IID}/${PDF_NAME}_${VERSION}.${CI_PIPELINE_IID}.pdf"'
+
+# https://docs.gitlab.com/ee/user/project/releases/release_cicd_examples.html
+.template:release_job:
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - echo "running release_job for ${PATH_TO_MD}_${VERSION}.${CI_PIPELINE_IID}"
+    - echo "${PATH_TO_MD}/${PDF_NAME}_${VERSION}.${CI_PIPELINE_IID}.pdf"
+  release:
+    tag_name: "${PATH_TO_MD}_${VERSION}.${CI_PIPELINE_IID}" # The version is incremented per pipeline.
+    description: "${PATH_TO_MD} ${VERSION}.${CI_PIPELINE_IID}"
+    ref: "$CI_COMMIT_SHA" # The tag is created from the pipeline SHA.
+    assets:
+      links:
+        - name: "${PDF_NAME}_${VERSION}.${CI_PIPELINE_IID}.pdf"
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PATH_TO_MD}/${VERSION}.${CI_PIPELINE_IID}/${PDF_NAME}_${VERSION}.${CI_PIPELINE_IID}.pdf"
+
+### Environnements ######################################################################################
+
+debug:
+  stage: build
+  script:
+    - echo $CI_PIPELINE_SOURCE
+    - echo $CI_COMMIT_BRANCH
+    - echo $CI_DEFAULT_BRANCH
+    - echo $CI_COMMIT_BEFORE_SHA
+
+pdf_generation_pfe:
+  stage: build
+  variables:
+    PATH_TO_MD: PlatformEngineering
+    PDF_NAME: DAT-pfe
+    VERSION: v1
+  rules: !reference [.template:build_rules, rules]
+  extends:
+    - .template:pdf_generation
+
+pdf_publish_pfe:
+  stage: deploy
+  variables:
+    PATH_TO_MD: PlatformEngineering
+    PDF_NAME: DAT-pfe
+    VERSION: v1
+  rules: !reference [.template:deploy_rules, rules]
+  needs:
+    - job: pdf_generation_pfe
+      artifacts: true
+  extends:
+    - .template:pdf_publish
+
+release_job_pfe:
+  stage: deploy
+  variables:
+    PATH_TO_MD: PlatformEngineering
+    PDF_NAME: DAT-pfe
+    VERSION: v1
+  rules: !reference [.template:deploy_rules, rules]
+  needs:
+    - job: pdf_publish_pfe
+  extends:
+    - .template:release_job

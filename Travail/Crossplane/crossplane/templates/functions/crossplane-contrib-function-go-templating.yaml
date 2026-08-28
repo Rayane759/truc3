@@ -1,0 +1,8 @@
+apiVersion: pkg.crossplane.io/v1
+kind: Function
+metadata:
+  name: crossplane-contrib-function-go-templating
+spec:
+  package: 'gitlab-registry.insee.fr/kubernetes/kubeqfapp/poc/crossplane/crossplane-contrib/function-go-templating:v0.12.2'
+  packagePullSecrets:
+    - name: registry-gitlab-insee-fr-pull-secret

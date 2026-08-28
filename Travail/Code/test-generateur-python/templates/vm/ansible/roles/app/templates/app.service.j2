@@ -1,0 +1,29 @@
+[Unit]
+Description={{ '{{ app_name }}' }} — {{ appDescription }}
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{ '{{ app_user }}' }}
+WorkingDirectory=/opt/{{ '{{ app_name }}' }}
+EnvironmentFile=/opt/{{ '{{ app_name }}' }}/.env
+
+{% if artifactFormat == "jar" %}
+ExecStart=/usr/bin/java -jar /opt/{{ '{{ app_name }}' }}/app.jar
+{% elif artifactFormat == "docker" %}
+ExecStart=/usr/bin/docker run --rm \
+  --name {{ '{{ app_name }}' }} \
+  --env-file /opt/{{ '{{ app_name }}' }}/.env \
+  -p {{ '{{ app_port }}' }}:{{ '{{ app_port }}' }} \
+  {{ nexusUrl }}/{{ nexusRepository }}/{{ '{{ app_name }}:{{ artifact_version }}' }}
+{% endif %}
+
+ExecStop=/bin/kill -TERM $MAINPID
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/{{ '{{ app_name }}' }}/app.log
+StandardError=append:/var/log/{{ '{{ app_name }}' }}/error.log
+
+[Install]
+WantedBy=multi-user.target

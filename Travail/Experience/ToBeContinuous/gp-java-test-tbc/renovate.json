@@ -1,0 +1,26 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["renovate/renovate-config"],
+  "schedule": [
+    "after 10pm every weekday",
+    "before 5am every weekday",
+    "every weekend"
+  ],
+  "timezone": "Europe/Paris",
+  "packageRules": [
+    {
+      "groupSlug": "minor-patch",
+      "branchName": "renovate/minor-patch",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "prTitle": "Renovate : all minor and patch updates",
+      "automerge": true
+    },
+    {
+      "groupSlug": "major",
+      "branchName": "renovate/major/{{packageName}}",
+      "matchUpdateTypes": ["major"],
+      "prTitle": "Renovate : update {{depName}} to {{newVersion}}"
+    }
+  ]
+}
+

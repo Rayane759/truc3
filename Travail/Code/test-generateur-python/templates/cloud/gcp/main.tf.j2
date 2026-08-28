@@ -1,0 +1,16 @@
+provider "google" {
+  project = var.gcp_project_id
+  region  = var.region
+}
+
+locals {
+  prefix      = "${var.app_name}-${var.environment}"
+  {% if enableLoadBalancer %}
+  lb_endpoint = google_compute_global_forwarding_rule.app.ip_address
+  {% else %}
+  lb_endpoint = google_compute_instance.app.network_interface[0].access_config[0].nat_ip
+  {% endif %}
+  {% if enableDatabase %}
+  db_endpoint = google_sql_database_instance.app.connection_name
+  {% endif %}
+}

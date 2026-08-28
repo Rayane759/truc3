@@ -1,0 +1,17 @@
+stages:
+  - build
+  - test
+  - docker
+
+build:
+  image: maven:3.9-eclipse-temurin-21
+  script:
+    - mvn clean package
+
+docker:
+  image: docker:24
+  services:
+    - docker:dind
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:latest

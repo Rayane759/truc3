@@ -1,0 +1,263 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: helm-chart-golden-path
+  title: Helm Chart — Golden Path
+  description: >
+    Déploie un environnement pour une application dans Kubernetes en générant les fichiers Helm préconfigurés selon les bonnes pratiques.
+  tags:
+  - helm
+  - kubernetes
+  - golden-path
+spec:
+  owner: dpii/plateforme-engineering
+  type: service
+
+  parameters:
+
+  # ── Étape 1 : Informations de l'application ───────────────────────────────────
+  - title: Informations de l'application
+    required:
+    - appName
+    - appDescription
+    - namespace
+    - environnement
+    properties:
+      appName:
+        title: Nom de l'application
+        type: string
+        description: >
+          Nom de l'application (minuscules, tirets autorisés). Sera utilisé comme nom du chart Helm et préfixe des ressources Kubernetes.
+        pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+      appDescription:
+        title: Description
+        type: string
+        description: Courte description de l'application (apparaîtra dans le Chart.yaml).
+      namespace:
+        title: Namespace
+        type: string
+        description: "Namespace Kubernetes cible (ex : projet-example)"
+      environnement:
+        title: Environnement
+        type: string
+        description: "Environnement cible (ex : dv, qf, pp, pd)"
+        default: dv
+        enum:
+        - dv
+        - pp
+        - pd
+        enumNames:
+        - "dv — Développement"
+        - "pp — Pré-production"
+        - "pd — Production"
+
+  # ── Étape 2 : Image & déploiement ─────────────────────────────────────────
+  - title: Image & déploiement
+    required:
+    - imageRepository
+    - imageTag
+    properties:
+      imageRepository:
+        title: Dépôt de l'image
+        type: string
+        description: >
+          Chemin complet vers l'image Docker, sans le tag (ex. registry.example.fr/mon-equipe/mon-app).
+      imageTag:
+        title: Tag de l'image
+        type: string
+        default: latest
+        description: Tag utilisé au premier déploiement
+
+  # ── Étape 3 : Profil de ressources ────────────────────────────────────────
+  - title: Profil de ressources
+    required:
+    - resourceProfile
+    properties:
+      resourceProfile:
+        title: Gabarit de ressources
+        type: string
+        default: s
+        description: >
+          Choisissez le gabarit qui correspond au besoin en CPU/mémoire de l'application.
+        enum:
+        - xs
+        - s
+        - m
+        - l
+        - xl
+        enumNames:
+        - "XS — 50m CPU  / 64Mi RAM  (batch léger, outil interne)"
+        - "S  — 100m CPU / 128Mi RAM (API légère, microservice)"
+        - "M  — 250m CPU / 512Mi RAM (application standard)"
+        - "L  — 500m CPU / 1Gi RAM   (traitement intensif)"
+        - "XL — 1 CPU   / 2Gi RAM   (application lourde, ML)"
+
+  # ── Étape 4 : Exposition réseau ────────────────────────────────────────────
+  - title: Exposition réseau
+    required:
+    - servicePort
+    - exposureProfile
+    properties:
+      servicePort:
+        title: Port applicatif
+        type: integer
+        default: 8080
+        enum:
+        - 8080
+        enumNames:
+        - "8080 — Application Spring Boot / React sur Nginx"
+      exposureProfile:
+        title: Mode d'exposition
+        type: string
+        default: internal
+        description: >
+          Définit si l'application est accessible depuis l'extérieur.
+        enum:
+        - internal
+        - external
+        enumNames:
+        - "Interne uniquement"
+        - "Exposée à l'extérieur"
+    dependencies:
+      exposureProfile:
+        oneOf:
+        - properties:
+            exposureProfile:
+              const: internal
+        - properties:
+            exposureProfile:
+              not:
+                const: internal
+            publicHost:
+              title: Nom de domaine public (FQDN)
+              type: string
+              description: "Exemple : mon-app.developpement.example.fr"
+          required:
+          - publicHost
+
+  # ── Étape 5 : Santé & scalabilité ─────────────────────────────────────────
+  - title: Santé & scalabilité
+    properties:
+      enableHealthProbes:
+        title: Activer les health checks (liveness / readiness)
+        type: boolean
+        default: true
+      healthPath:
+        title: Chemin de base des sondes de santé
+        type: string
+        default: /actuator
+        description: >
+          Préfixe des endpoints de santé. Les sondes appelleront {Chemin}/liveness et {Chemin}/readiness.
+      enableAutoscaling:
+        title: Activer l'autoscaling horizontal (HPA)
+        type: boolean
+        default: false
+        description: >
+          Crée un HorizontalPodAutoscaler qui augmente le nombre de réplicas automatiquement si le CPU dépasse 80 %.
+      replicaCount:
+        title: Nombre de réplicas
+        type: integer
+        default: 1
+        minimum: 1
+        maximum: 20
+        description: Nombre de pods à maintenir en fonctionnement.
+
+  # ── Étape 6 : Type de charge de travail ───────────────────────────────────
+  - title: Avancé
+    properties:
+      workloadType:
+        title: Type de charge de travail
+        type: string
+        default: Deployment
+        description: >
+          Choisissez Deployment pour une application sans état ou StatefulSet si l'application nécessite un stockage persistant stable.
+        enum:
+        - Deployment
+        - StatefulSet
+        enumNames:
+        - "Deployment (sans état)"
+        - "StatefulSet (avec stockage persistant)"
+
+  # ── Étape 7 : Dépôt GitLab cible ──────────────────────────────────────────
+  - title: Dépôt GitLab cible
+    required:
+    - repoGitUrl
+    properties:
+      repoGitUrl:
+        title: URL du dépôt GitLab
+        type: string
+        description: >
+          Dépôt GitLab existant dans lequel les fichiers Helm seront poussés.
+        default: "https://gitlab.example.fr/mon-groupe/mon-depot.git"
+  # ---------------------------------------------------------------------------
+  # Steps
+  # ---------------------------------------------------------------------------
+  steps:
+
+  # 1. Parser l'URL du dépôt GitLab
+  - id: parse-repo
+    name: Parser l'URL du dépôt
+    action: insee:parse-git-url
+    input:
+      url: ${{ parameters.repoGitUrl }}
+
+  # 2. Générer les fichiers Helm depuis le skeleton
+  - id: fetch-helm
+    name: Générer les fichiers Helm
+    action: fetch:template
+    input:
+      url: ./skeleton
+      targetPath: ./workspace/apps/${{ parameters.appName }}/${{ parameters.environnement }}
+      values:
+        appName: ${{ parameters.appName }}
+        appDescription: ${{ parameters.appDescription }}
+        namespace: ${{ parameters.namespace }}
+        environnement: ${{ parameters.environnement }}
+        imageRepository: ${{ parameters.imageRepository }}
+        imageTag: ${{ parameters.imageTag }}
+        workloadType: ${{ parameters.workloadType }}
+        replicaCount: ${{ parameters.replicaCount | default(1) }}
+        resourceProfile: ${{ parameters.resourceProfile }}
+        servicePort: ${{ parameters.servicePort }}
+        exposureProfile: ${{ parameters.exposureProfile }}
+        publicHost: ${{ parameters.publicHost | default("") }}
+        enableHealthProbes: ${{ parameters.enableHealthProbes | default(true) }}
+        healthPath: ${{ parameters.healthPath | default("/actuator") }}
+        enableAutoscaling: ${{ parameters.enableAutoscaling | default(false) }}
+        useExternalSecrets: ${{ parameters.useExternalSecrets | default(false) }}
+        configEnv: ${{ parameters.configEnv | default([]) }}
+
+  # 3. Ouvrir la Merge Request
+  - id: open-mr
+    name: Ouvrir la Merge Request
+    action: publish:gitlab:merge-request
+    input:
+      repoUrl: ${{ steps['parse-repo'].output.repoUrl }}
+      branchName: feat/add-${{ parameters.appName }}-${{ parameters.environnement }}-chart
+      title: "feat: add ${{ parameters.appName }} (${{ parameters.environnement }})"
+      description: |
+        ## Nouvelle application — ${{ parameters.appName }}
+
+        | Champ | Valeur |
+        |---|---|
+        | **Nom** | `${{ parameters.appName }}` |
+        | **Description** | ${{ parameters.appDescription }} |
+        | **Environnement** | `${{ parameters.environnement }}` |
+        | **Namespace** | `${{ parameters.namespace }}` |
+        | **Image** | `${{ parameters.imageRepository }}:${{ parameters.imageTag }}` |
+        | **Profil ressources** | `${{ parameters.resourceProfile }}` |
+        | **Exposition** | `${{ parameters.exposureProfile }}` |
+        | **Autoscaling** | `${{ parameters.enableAutoscaling | default(false) }}` |
+
+        > Généré automatiquement via le Scaffolder Backstage — Golden Path.
+      sourcePath: ./workspace
+      targetBranchName: main
+      removeSourceBranch: true
+      commitAction: auto
+  # ---------------------------------------------------------------------------
+  # Output
+  # ---------------------------------------------------------------------------
+  output:
+    links:
+    - title: Voir la Merge Request
+      url: ${{ steps['open-mr'].output.mergeRequestUrl }}

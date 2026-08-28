@@ -1,0 +1,180 @@
+DevExp 26/01/2026 : Réponses (notes)
+
+
+Colonne D et E : (IDE, Gitlab, CI/CD, Podman, Sonar, Compas, Oscar, ...)
+
+
+Besoin de centraliser la documentation, et de la mettre à jour
+
+
+Sonar : Bien (mais il faut pas que ça devienne bloquant) (1 remarque : ligne 36)
+	On perd du temps apparemment ?
+
+CI/CD : Plus de support (1 remarque : ligne 36)
+
+AgentSecret : Pas ouf apparemment (1 remarque : ligne 36)
+
+
+Manque d'outils communs sur l'accessibilité mis en avant (1 remarque : ligne 68)
+
+
+Podman : Devient très important (1 remarque : ligne 82)
+
+
+Beaucoup de gênes avec l'utilisation des proxy et des certificats internes. Voire des incohérences. Gitlab est par exemple signé avec un certificat Certigna,
+	cependant, les registry gitlab sont signés avec un certificat interne. Il est nécessaire d'inclure l'AC dans Podman pour pouvoir pull une image Docker de Gitlab.
+	S'ajoute à cela la gestion du proxy, ajoutant une complexité importante pour déboguer.
+
+
+
+
+
+Colonnes G et H : (Devops VM)
+
+
+Besoin de centraliser la documentation, et de la mettre à jour. Aussi, étoffer la FAQ et la documentation (pas assez explicite sur certaines variables).
+	Aussi, besoin de standardiser la documentation, et expliciter à quel besoin cette doc répond.
+	Créer un chemin de base.
+
+
+Rundeck : souvent facile à utiliser (mais parfois, il y a peu de documentation). Certains jobs rament
+	Aussi, ça semble parfois non nécessaire pour certains ("plus simple d'avoir des accès ssh pour exécuter des scripts, lister des répertoires, voir logs afficher des fichiers de configuration...")
+
+
+Cactus : Bien apparemment mais la doc était pas à jour + Peu de support
+
+
+Pas facile de voir rapidement l'état de la configuration des VM d'une application (-> Centraliser l'observabilité)
+	Aussi, difficile de voir sur Rundeck si un job est toujours utilisable, quelle version utiliser, où le trouver, si un tel job existe, ...
+
+
+Ajouter le SSO sur Rundeck ?
+
+
+Beaucoup de connaissances OPS nécessaires pour paramétrer finement les services de VM (connaissances difficiles à acquérir et à maintenir)
+
+
+
+
+
+Colonnes J et K : (DevOps Kube)
+
+
+Les chartes Helm c'est bien. Même si ça reste un truc de plus à faire qui n'est pas du dev
+
+
+La documentation est plus adaptée aux OPS qu'aux DEV (très compliqué de configurer) -> Simplifier la doc
+	Toujours centraliser la doc
+
+
+Il faudrait intégrer ArgoWorkFlow aux Charts génériques
+
+
+L'offre est très riche et évolue rapidement -> Avantage de la Plateforme
+
+
+
+
+
+Colonnes M et N : (PES, Analyzer, Checkmarx, Gitleaks, ...)
+
+
+Centraliser et clarifier à la fois la documentation et le flux d'information
+
+
+
+
+
+Colonnes P et Q : (Observabilite : Elastic, Graphana, Glowroot, ...)
+
+
+Elastic c'est bien apparemment
+
+Glowroot c'est parfois laborieux, et peut causer certains soucis (saturation)
+
+C'est assez fastidieux de configurer tous ces outils (et que ce soit décorrélé de Kube malgré son importance).
+En plus, il y a des modes d'authentification différents et des IHM différents ...
+
+Difficile de s'y retrouver ...
+Peu d'exemple de code dans la doc
+
+Grafana ne marche plus en hors-prod sur Kube, et Elastic casse la prod
+Outil pour trouver à quel endroit du réseau ça a cassé ?
+
+Accès facilité à ELK serait bien (???????)
+
+Articulation floue entre les offres VM et Kube (???)
+
+
+
+
+
+Colonnes Y et Z : (DevExp de manière générale)
+
+
+Problème de documentation : Où trouver l'information ? A qui s'adresser ? -> Un portail unique pour savoir il faut faire quoi 
+
+Il faut aussi développer des offres "clé en main"
+
+Beaucoup de choses à maîtriser : CI, Rundeck, GitOps, ArgoCD, ArgoWorkFlow, Sécurité, Craft (???)
+
+
+
+
+
+Colonne AB : (Choses à améliorer)
+
+
+Une liste / page de qui s'occupe de quoi --> Centraliser l'information dans un point unique d'entrée
+
+Plus de documentation concernant Rundeck
+
+Meilleure observabilité sur Kube (Gestion des logs et Dashboards Grafana)
+
+Moduler la priorité des problèmes de sécurité / Politique de sécurité intelligente
+
+Simplifier la gestion des failles de sécurité dans Kube
+
+Améliorer la gestion des proxy
+
+Des offres "clé en main"
+
+Avoir un "mode d'emploi" de tout ce qui a trait au développement d'une application ou d'un groupe d'applicatifs à l'Insee. 
+Un point d'entrée, qui listerait tous les éléments auquel on doit penser. Avec des liens vers les différentes ressources ou documentations déjà existantes
+
+Plus d'accompagnement sur le CI/CD
+
+Améliorer les outils pour le frontend et le Web Design (souvent délaissés) (??)
+
+Possibilité de pouvoir tout installer et configurer en 1 seul clic 
+
+Harmoniser les architectures entre les différents projets
+
+Mettre en place dans Vault, d'un espace partagé par les applications d'un même quartier, afin de ne pas être dans l'obligation de dupliquer 
+les secrets commun à ces applications (ex : secret Keycloak pour l'accès en localhost).
+
+
+
+
+
+
+
+
+Claude Code, Antigravity, GitHub Copilot, etc. proposent tous des assistants de développement basés sur des modèles de la famille Claude, dont Claude Opus 4.5, aujourd’hui considéré comme l’un des modèles les plus performants pour le codage.
+Amazon propose avec Amazon Bedrock un service d’inférence managée permettant un traitement régional des requêtes (souveraineté opérationnelle assurée contractuellement), tout en garantissant que les données et les prompts restent la propriété du client et ne sont pas réutilisés pour l’entraînement des modèles.
+Le service s’intègre dans un VPC, avec la possibilité de restreindre ou supprimer l’accès Internet, d’utiliser des endpoints privés, et de mettre en place des mécanismes complets de journalisation, traçabilité et audit.
+On est ainsi très loin d’un "copilot branché sur le web".
+Des solutions comme Amazon Bedrock permettent pour la première fois d’envisager une assistance IA industrielle, encadrée et auditée, compatible avec des exigences fortes de sécurité et de confidentialité, là où les outils grand public sont hors-cadre par nature.
+
+Sources :
+https://aws.amazon.com/fr/about-aws/whats-new/2025/11/claude-opus-4-5-amazon-bedrock/
+https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/data-protection.html
+
+
+
+
+
+
+https://diffusion.gitlab-pages.insee.fr/plateforme-de-donnees/plateforme-de-donnees
+https://portail-devexp.developpement.insee.fr/

@@ -1,0 +1,18 @@
+HTTP Service Clients
+Versioning d'API
+
+Jackson3 : Pour le JSON
+SpringCore 7
+
+Observabilité : OpenTelemetry
+	Observed (une notation)
+	
+	
+SpringBoot4 et HTTP Services
+Annotation @HttpExchange (qui vient de SpringCore)
+Intégration Spring Security
+
+@GetExchange au lieu de @GetMapping (?)
+
+
+JUnit et Cucumber ??

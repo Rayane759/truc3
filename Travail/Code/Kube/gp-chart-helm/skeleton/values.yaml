@@ -1,0 +1,77 @@
+# ──────────────────────────────────────────────
+# Généré automatiquement par le Golden Path
+# ──────────────────────────────────────────────
+
+# Identité
+appName: ${{ values.appName }}
+namespace: ${{ values.environnement }}-${{ values.appName }}
+
+# Image
+image:
+  repository: ${{ values.imageRepository }}
+  tag: ${{ values.imageTag }}
+
+# Workload
+workloadType: ${{ values.workloadType }}
+replicaCount: ${{ values.replicaCount }}
+
+# Profils de ressources
+{% set profiles = {
+  "xs": {"cpuRequest": "50m",  "memRequest": "64Mi",  "cpuLimit": "100m", "memLimit": "128Mi"},
+  "s":  {"cpuRequest": "100m", "memRequest": "128Mi", "cpuLimit": "250m", "memLimit": "256Mi"},
+  "m":  {"cpuRequest": "250m", "memRequest": "512Mi", "cpuLimit": "500m", "memLimit": "1Gi"},
+  "l":  {"cpuRequest": "500m", "memRequest": "1Gi",   "cpuLimit": "1",    "memLimit": "2Gi"},
+  "xl": {"cpuRequest": "1",    "memRequest": "2Gi",   "cpuLimit": "2",    "memLimit": "4Gi"}
+} %}
+resources:
+  requests:
+    cpu: "${{ profiles[values.resourceProfile].cpuRequest }}"
+    memory: "${{ profiles[values.resourceProfile].memRequest }}"
+  limits:
+    cpu: "${{ profiles[values.resourceProfile].cpuLimit }}"
+    memory: "${{ profiles[values.resourceProfile].memLimit }}"
+
+# Réseau
+service:
+  port: ${{ values.servicePort }}
+
+exposure:
+  profile: ${{ values.exposureProfile }}
+  {% if values.exposureProfile === "external" %}
+  publicHost: ${{ values.publicHost }}
+  {% endif %}
+
+# Santé
+healthProbes:
+  enabled: ${{ values.enableHealthProbes }}
+  {% if values.enableHealthProbes %}
+  livenessPath: ${{ values.healthPath }}/liveness
+  readinessPath: ${{ values.healthPath }}/readiness
+  {% endif %}
+
+# Autoscaling
+autoscaling:
+  enabled: ${{ values.enableAutoscaling }}
+  {% if values.enableAutoscaling %}
+  minReplicas: ${{ values.replicaCount }}
+  maxReplicas: 10
+  cpuThreshold: 80
+  {% endif %}
+
+# Variables d'environnement (non sensibles)
+configEnv:
+  {% if values.configEnv | length > 0 %}
+  {% for item in values.configEnv %}
+  ${{ item.key }}: "${{ item.value }}"
+  {% endfor %}
+  {% else %}
+  {}
+  {% endif %}
+
+# Secrets Vault (External Secrets Operator)
+externalSecrets:
+  enabled: ${{ values.useExternalSecrets }}
+  {% if values.useExternalSecrets %}
+  # À compléter : Vault
+  # vaultPath: "secret/data/${{ values.appName }}"
+  {% endif %}

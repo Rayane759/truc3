@@ -1,0 +1,16 @@
+Un environnement très riche  ; Auth, déploiement, CI, ...
+
+La plateforme a un besoin en continu, et pas qu'au début du projet
+
+Parler du début du DevOps, de ce que ça a permis et des difficultés rencontrées. Puis ce que la plateforme permet. 
+Faut rester compréhensible par tout le public
+
+Bien définir les termes : Charts Helm, CI, ...
+
+Présenter des notions importantes : Kubernetes par exemple (ce qu'on faisait avant, et comment on en arrivait là)
+
+Regarder les "notes d'intention" de l'IG pour avoir une idée des projets. Si possible : 1 gros projet par SNDI
+
+Schémas propres et bien visibles
+
+Montrer le résultat, les productions, les réponses (même partielles) à des questions / problèmes

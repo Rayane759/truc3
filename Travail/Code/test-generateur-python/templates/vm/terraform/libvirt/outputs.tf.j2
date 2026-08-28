@@ -1,0 +1,11 @@
+output "vm_name" {
+  value = libvirt_domain.app.name
+}
+
+output "vm_ip" {
+  value = libvirt_domain.app.network_interface[0].addresses[0]
+}
+
+output "ansible_inventory_hint" {
+  value = "ansible-playbook -i ansible/inventory.ini ansible/playbook.yml -e vm_ip=${libvirt_domain.app.network_interface[0].addresses[0]}"
+}

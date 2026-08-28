@@ -1,0 +1,103 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xhelmapps.platform.example.org
+spec:
+  compositeTypeRef:
+    apiVersion: platform.example.org/v1alpha1
+    kind: XHelmApp
+  mode: Pipeline
+  pipeline:
+    - step: create-helm-release
+      functionRef:
+        name: crossplane-contrib-function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            ---
+            apiVersion: helm.crossplane.io/v1beta1
+            kind: Release
+            metadata:
+              annotations:
+                gotemplating.fn.crossplane.io/composition-resource-name: helm-release
+            spec:
+              forProvider:
+                chart:
+                  name: helm-example
+                  repository: https://gitlab.insee.fr/api/v4/projects/10954/packages/helm/stable
+                  version: "3.2.0"
+                  pullSecretRef:
+                    name: gitlab-helm-credentials
+                    namespace: crossplane
+                namespace: {{ "{{" }} .observed.composite.resource.spec.parameters.namespace {{ "}}" }}
+                skipCreateNamespace: true
+                values:
+                  automountServiceAccountToken: false
+                  autoReloadPodWhenConfigurationChange: "ALL"
+                  securityContext:
+                    capabilities:
+                      drop:
+                        - ALL
+                    readOnlyRootFilesystem: true
+                    allowPrivilegeEscalation: false
+                    runAsNonRoot: true
+                  {{ "{{" }}- with .observed.composite.resource.spec.parameters.replicaCount {{ "}}" }}
+                  replicaCount: {{ "{{" }} . {{ "}}" }}
+                  {{ "{{" }}- end {{ "}}" }}
+                  {{ "{{" }}- with .observed.composite.resource.spec.parameters.type {{ "}}" }}
+                  type: {{ "{{" }} . {{ "}}" }}
+                  {{ "{{" }}- end {{ "}}" }}
+                  image:
+                    repository: {{ "{{" }} .observed.composite.resource.spec.parameters.image.repository {{ "}}" }}
+                    tag: {{ "{{" }} .observed.composite.resource.spec.parameters.image.tag | quote {{ "}}" }}
+                    {{ "{{" }}- with .observed.composite.resource.spec.parameters.image.pullPolicy {{ "}}" }}
+                    pullPolicy: {{ "{{" }} . {{ "}}" }}
+                    {{ "{{" }}- end {{ "}}" }}
+                  {{ "{{" }}- with .observed.composite.resource.spec.parameters.resources {{ "}}" }}
+                  resources:
+                    {{ "{{" }}- with .requests {{ "}}" }}
+                    requests:
+                      {{ "{{" }}- with .cpu {{ "}}" }}
+                      cpu: {{ "{{" }} . | quote {{ "}}" }}
+                      {{ "{{" }}- end {{ "}}" }}
+                      {{ "{{" }}- with .memory {{ "}}" }}
+                      memory: {{ "{{" }} . | quote {{ "}}" }}
+                      {{ "{{" }}- end {{ "}}" }}
+                    {{ "{{" }}- end {{ "}}" }}
+                    {{ "{{" }}- with .limits {{ "}}" }}
+                    limits:
+                      {{ "{{" }}- with .cpu {{ "}}" }}
+                      cpu: {{ "{{" }} . | quote {{ "}}" }}
+                      {{ "{{" }}- end {{ "}}" }}
+                      {{ "{{" }}- with .memory {{ "}}" }}
+                      memory: {{ "{{" }} . | quote {{ "}}" }}
+                      {{ "{{" }}- end {{ "}}" }}
+                    {{ "{{" }}- end {{ "}}" }}
+                  {{ "{{" }}- end {{ "}}" }}
+                  {{ "{{" }}- with .observed.composite.resource.spec.parameters.service {{ "}}" }}
+                  service:
+                    {{ "{{" }}- with .port {{ "}}" }}
+                    port: {{ "{{" }} . {{ "}}" }}
+                    {{ "{{" }}- end {{ "}}" }}
+                    {{ "{{" }}- with .type {{ "}}" }}
+                    type: {{ "{{" }} . {{ "}}" }}
+                    {{ "{{" }}- end {{ "}}" }}
+                  {{ "{{" }}- end {{ "}}" }}
+                  {{ "{{" }}- with .observed.composite.resource.spec.parameters.env {{ "}}" }}
+                  config:
+                    env:
+                      {{ "{{" }}- range $key, $val := . {{ "}}" }}
+                      {{ "{{" }} $key {{ "}}" }}: {{ "{{" }} $val | quote {{ "}}" }}
+                      {{ "{{" }}- end {{ "}}" }}
+                  {{ "{{" }}- end {{ "}}" }}
+                  {{ "{{" }}- with .observed.composite.resource.spec.parameters.values {{ "}}" }}
+                  {{ "{{" }}- toYaml . | nindent 6 {{ "}}" }}
+                  {{ "{{" }}- end {{ "}}" }}
+              providerConfigRef:
+                name: default
+    - step: auto-ready
+      functionRef:
+        name: crossplane-contrib-function-auto-ready

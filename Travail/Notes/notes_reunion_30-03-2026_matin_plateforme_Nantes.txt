@@ -1,0 +1,11 @@
+Nous souhaitons renforcer le sentiment d’accomplissement des Dev et des Ops en leur permettant de se reconcentrer sur les tâches qui ont de la valeur. 
+Nous souhaitons donner une plateforme structurant la connaissance. Les gains pour l’entreprise : impact en ruissellement, flux de travail accéléré, 
+plus de qualité, conformité, sécurité. Moins de dépendances entre les évolutions technique et le changement 
+
+Des dev qui sont perdus, ne savent pas à qui parler, quoi demander, ni ou le trouver
+
+Crossplane
+
+Template applicatif
+
+Emmanuel - DSE

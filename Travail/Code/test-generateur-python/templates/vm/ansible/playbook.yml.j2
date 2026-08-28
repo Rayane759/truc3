@@ -1,0 +1,21 @@
+---
+- name: "Déploiement de {{ appName }} ({{ environnement }})"
+  hosts: app
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - roles/app/vars/main.yml
+
+  roles:
+    - role: app
+
+  post_tasks:
+    - name: Vérifier que l'application répond
+      uri:
+        url: "http://localhost:{{ appPort }}/actuator/health"
+        status_code: 200
+      register: health
+      retries: 5
+      delay: 5
+      until: health.status == 200

@@ -1,0 +1,25 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.appName }}
+  title: ${{ values.appName }}
+  description: |
+    ${{ values.appDescription }} — Service déployé sur Kubernetes via le Golden Path Helm.
+  tags:
+  - helm
+  - kubernetes
+  - ${{ values.environnement }}
+  annotations:
+    # GitLab
+    gitlab.com/project-slug: ${{ values.repoProjectPath }}
+    gitlab.com/ci-pipeline: ${{ values.repoProjectPath }}
+    gitlab.com/instance: gitlab.example.fr
+
+    # Kubernetes
+    backstage.io/kubernetes-id: ${{ values.appName }}
+    backstage.io/kubernetes-namespace: ${{ values.namespace }}
+spec:
+  type: service
+  lifecycle: ${{ values.environnement }}
+  owner: dpii/plateforme-engineering
+  system: ${{ values.appName }}

@@ -1,0 +1,95 @@
+variable "app_name" {
+  type    = string
+  default = "{{ appName }}"
+}
+
+variable "team_name" {
+  type    = string
+  default = "{{ teamName }}"
+}
+
+variable "environment" {
+  type    = string
+  default = "{{ environnement }}"
+}
+
+variable "cpu_count" {
+  type    = number
+  default = {{ vmSize.cpu }}
+}
+
+variable "ram_mb" {
+  type    = number
+  default = {{ vmSize.ram_mb }}
+}
+
+variable "disk_gb" {
+  type    = number
+  default = {{ vmSize.disk_gb }}
+}
+
+variable "vm_network" {
+  type    = string
+  default = "{{ vmNetwork }}"
+}
+
+variable "vm_folder" {
+  type    = string
+  default = "{{ vmFolder }}"
+}
+
+variable "vm_domain" {
+  type    = string
+  default = "example.fr"
+}
+
+variable "vm_ip" {
+  description = "Adresse IP statique de la VM (à renseigner)"
+  type        = string
+}
+
+variable "vm_netmask" {
+  type    = number
+  default = 24
+}
+
+variable "vm_gateway" {
+  description = "Passerelle réseau"
+  type        = string
+}
+
+# vSphere
+variable "vsphere_server" {
+  description = "FQDN ou IP du vCenter"
+  type        = string
+}
+
+variable "vsphere_user" {
+  type      = string
+  sensitive = true
+}
+
+variable "vsphere_password" {
+  type      = string
+  sensitive = true
+}
+
+variable "vsphere_datacenter" {
+  type    = string
+  default = "DC1"
+}
+
+variable "vsphere_datastore" {
+  type    = string
+  default = "{{ vmDatastore }}"
+}
+
+variable "vsphere_cluster" {
+  type    = string
+  default = "Cluster1"
+}
+
+variable "vm_template" {
+  type    = string
+  default = "{{ osImage }}"
+}

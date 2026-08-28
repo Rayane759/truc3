@@ -1,0 +1,49 @@
+apiVersion: platform.example.org/v1alpha1
+kind: HelmApp
+metadata:
+  name: mon-app-complete
+  namespace: equipe-x
+spec:
+  parameters:
+    namespace: mon-app-ns
+    replicaCount: 3
+    type: Deployment
+    image:
+      repository: gitlab-registry.insee.fr/kubernetes/dev/poc/mon-image
+      tag: "2.1.0"
+      pullPolicy: Always
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    service:
+      port: 8080
+      type: ClusterIP
+    env:
+      SPRING_PROFILES_ACTIVE: "production"
+      LOG_LEVEL: "INFO"
+    # Tout ce que les champs structurés ne couvrent pas :
+    values:
+      livenessProbe:
+        httpGet:
+          path: /actuator/health/liveness
+          port: http
+        initialDelaySeconds: 15
+        periodSeconds: 10
+      readinessProbe:
+        httpGet:
+          path: /actuator/health/readiness
+          port: http
+        initialDelaySeconds: 15
+        periodSeconds: 10
+      autoscaling:
+        enabled: true
+        minReplicas: 2
+        maxReplicas: 10
+        targetCPUUtilizationPercentage: 80
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: 1
